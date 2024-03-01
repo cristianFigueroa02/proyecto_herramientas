@@ -18,7 +18,7 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
 
     if ($existe_nit) {
         echo '<script> alert ("Ya existe una empresa con ese NIT.");</script>';
-        echo '<script> window.location="formulario_registro.php"</script>';
+        echo '<script> window.location="crear_empresa.php"</script>';
     } else {
         // Insertar los datos en la base de datos
         $insertsql = $conectar->prepare("INSERT INTO empresa (nit, nombre_empre, direccion, gmail, telefono) VALUES (?, ?, ?, ?, ?)");

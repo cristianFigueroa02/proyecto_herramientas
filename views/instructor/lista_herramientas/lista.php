@@ -1,4 +1,4 @@
-<?php
+    <?php
     require_once("../../../bd/database.php");
     $db = new Database();
     $conectar = $db->conectar();
@@ -13,7 +13,7 @@
         $usuarioQuery->execute();
         $usuario = $usuarioQuery->fetch();
 
-        $usua = $conectar->prepare("SELECT * FROM empresa ");
+        $usua = $conectar->prepare("SELECT * FROM herrramienta,categoria WHERE herrramienta.id_cate = categoria.id_cate");
         $usua->execute();
         $asigna = $usua->fetchAll(PDO::FETCH_ASSOC);
     } else {
@@ -71,7 +71,7 @@
                                     <div class="logo">
                                         <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                     </div>
-                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido Administrador <?= $usuario['nombre']; ?> </h2>
+                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido admin <?= $usuario['nombre']; ?> </h2>
                                 </div>
                             </div>
                         </div>
@@ -81,16 +81,16 @@
         </header>
 
         <div class="container mt-3">
-            <a href="crear_empresa.php" class="btn btn-success mb-2">Crear una empresa</a>
+            <a href="crear_herramientas.php" class="btn btn-success mb-2">Crear un arma</a>
 
             <table class="table table-striped table-bordered table-hover">
                 <thead class="thead-dark">
                     <tr style="text-transform: uppercase;">
                         <th>nombre</th>
-                        <th>nit</th>
-                        <th>direccion</th>
-                        <th>gmail</th>
-                        <th>telefono</th>
+                        <th>Tipo de herramienta</th>
+                        <th>estado</th>
+                        <th>codigo de barras</th>
+                        <th>Imagen</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -98,20 +98,20 @@
                     
                     <?php foreach ($asigna as $usua) { ?>
                         <tr>
-                            <td><?= $usua["nombre_empre"] ?></td>
-                            <td><?= $usua["nit"] ?></td>
-                            <td><?= $usua["direccion"] ?></td>
-                            <td><?= $usua["gmail"] ?></td>
-                            <td><?= $usua["telefono"] ?></td>
+                            <td><?= $usua["nombre_he"] ?></td>
+                            <td><?= $usua["categoria"] ?></td>
+                            <td><?= $usua["estado"] ?></td>
+                            <td><img src="../../../images/<?=$usua["codigo_barras"] ?>.png" style="max-width: 75px;"></td>
+                            <td><img src="../../../images/<?= $usua["img_herramienta"] ?>" style="max-width: 75px;"></td>
                             <td>
-                                <a href="editar_empresa.php?id=<?= $usua["nit"] ?>" class="btn btn-primary " >Actualizar</a>
-                                <a href="eliminar_empresa.php?id=<?= $usua["nit"] ?>" class="btn btn-danger">Eliminar</a>
+                                <a href="editar_herramienta.php?id=<?= $usua["id_herramienta"] ?>" class="btn btn-primary " >Actualizar</a>
+                                <a href="eliminar_herramienta.php?id=<?= $usua["id_herramienta"] ?>" class="btn btn-danger">Eliminar</a>
                             </td>
                         </tr>
                     <?php } ?>
                 </tbody>
             </table>
-            <a href="../index.php" class="btn btn-danger">Regresar</a>
+            <a href="../index.php" class="btn btn-secondary">Regresar</a>
         </div>
         <!-- footer -->
         <footer>

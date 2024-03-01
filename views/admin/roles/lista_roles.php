@@ -13,7 +13,7 @@
         $usuarioQuery->execute();
         $usuario = $usuarioQuery->fetch();
 
-        $usua = $conectar->prepare("SELECT * FROM empresa ");
+        $usua = $conectar->prepare("SELECT * FROM rol ");
         $usua->execute();
         $asigna = $usua->fetchAll(PDO::FETCH_ASSOC);
     } else {
@@ -71,7 +71,7 @@
                                     <div class="logo">
                                         <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                     </div>
-                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido Administrador <?= $usuario['nombre']; ?> </h2>
+                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido Aprendiz <?= $usuario['nombre']; ?> </h2>
                                 </div>
                             </div>
                         </div>
@@ -81,31 +81,25 @@
         </header>
 
         <div class="container mt-3">
-            <a href="crear_empresa.php" class="btn btn-success mb-2">Crear una empresa</a>
+            <a href="crear_rol.php" class="btn btn-success mb-2">Crear un rol</a>
 
             <table class="table table-striped table-bordered table-hover">
                 <thead class="thead-dark">
-                    <tr style="text-transform: uppercase;">
+                    <tr style="text-transform: uppercase; text-align:center;">
                         <th>nombre</th>
-                        <th>nit</th>
-                        <th>direccion</th>
-                        <th>gmail</th>
-                        <th>telefono</th>
+                        <th>Tipo de herramienta</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     
                     <?php foreach ($asigna as $usua) { ?>
-                        <tr>
-                            <td><?= $usua["nombre_empre"] ?></td>
-                            <td><?= $usua["nit"] ?></td>
-                            <td><?= $usua["direccion"] ?></td>
-                            <td><?= $usua["gmail"] ?></td>
-                            <td><?= $usua["telefono"] ?></td>
+                        <tr style="text-align:center;">
+                            <td><?= $usua["id_rol"] ?></td>
+                            <td><?= $usua["rol"] ?></td>
                             <td>
-                                <a href="editar_empresa.php?id=<?= $usua["nit"] ?>" class="btn btn-primary " >Actualizar</a>
-                                <a href="eliminar_empresa.php?id=<?= $usua["nit"] ?>" class="btn btn-danger">Eliminar</a>
+                                <a href="editar_roles.php?id=<?= $usua["id_rol"] ?>" class="btn btn-primary " >Actualizar</a>
+                                <a href="eliminar_rol.php?id=<?= $usua["id_rol"] ?>" class="btn btn-danger">Eliminar</a>
                             </td>
                         </tr>
                     <?php } ?>

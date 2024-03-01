@@ -1,8 +1,19 @@
+
+
 <?php
 require_once("bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
+
+//superadmin: 
+//documento: 1107975322
+//contraseña: $2y$15$nmOJkdLlTBmKk7gxu3zg1OpdsI5ufU8GuNdDJiEv15c4sMzQdKxXO
+
+//admin: 
+//documento: 171717
+//constraseña: $2y$15$6r4pE4IwUlrwuydtZgvXaOfyBrShteuyG8FIN5cj9jhFeKC/IqL8y
+// Verificamos que la contraseña sea correcta utilizando password_verify
 
 if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
     // Obtener datos del formulario
@@ -19,22 +30,22 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
 
 
     if ($usuario) {
-        // Verificamos que la contraseña sea correcta utilizando password_verify
+ 
 
         if (password_verify($contrasena, $usuario['contraseña'])) {
 
-            // Verificamos si el usuario está activo (id_estado = 1)
+
             if ($usuario['estado'] == "activo") {
                 $_SESSION['documento'] = $usuario['documento'];
                 $_SESSION['rol'] = $usuario['id_rol'];
                 $_SESSION['estado'] = $usuario['estado'];
 
-                var_dump($_SESSION); // Agrega esta línea para debug
+                var_dump($_SESSION); 
 
 
 
 
-                // Redirigir según el rol del usuario
+
                 if ($_SESSION['rol'] == 1) {
                     header("Location: views/admin/index.php");
                     exit();
@@ -43,6 +54,10 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                     exit();
                 } elseif ($_SESSION['rol'] == 3) {
                     header("Location: views/superadmin/index.php");
+                    exit();
+                }
+                elseif ($_SESSION['rol'] == 4) {
+                    header("Location: views/instructor/index.php");
                     exit();
                 } else {
                     echo "<script> alert ('Su usuario está bloqueado');</script>";
@@ -54,8 +69,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                 echo '<script>window.location="index.html"</script>';
                 exit();
             }
-        } else {
-        }
+        } 
     }
 }
 

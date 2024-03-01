@@ -3,54 +3,40 @@ require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
-require '../../../vendor/autoload.php';
 
-use Picqer\Barcode\BarcodeGeneratorPNG;
 
-if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
-    $nombre = $_POST['nombre'];
-    $tipo = $_POST['tipo'];
-    $imagen = $_FILES['imagen'];
+if (isset($_GET['id'])) {
+    // Recupera el ID de la URL
+    $id = $_GET['id'];
 
-    // Generar un código de barras único
-    $codigo_barras = uniqid() . rand(1000, 9999);
+    $validar = $conectar->prepare("SELECT * FROM usuario,empresa WHERE usuario.nit=empresa.nit AND documento = ?");
+    $validar->execute([$id]);
+    $usuario = $validar->fetch();
+    
+    $tiposherrasQuery = $conectar->prepare("SELECT nit,nombre_empre FROM empresa");
+    $tiposherrasQuery->execute();
+    $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
 
-    $generator = new BarcodeGeneratorPNG();
-    $codigo_barras_imagen = $generator->getBarcode($codigo_barras, $generator::TYPE_CODE_128);
 
-    // Guardar el código de barras en un archivo
-    file_put_contents(__DIR__ . '/../../../images/' . $codigo_barras . '.png', $codigo_barras_imagen);
+    // Check if form is submitted
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $nombre = $_POST['nombre'];
+        $email = $_POST['email'];
+        $empresa = $_POST['empresa'];
+        $telefono = $_POST['telefono'];
 
-    $fecha = date('Y-m-d');
+        // Prepare and execute the update query
+        $updateQuery = $conectar->prepare("UPDATE usuario SET nombre = ?,email = ?,nit = ? WHERE documento = ?");
+        $updateQuery->execute([$nombre, $email, $empresa, $id]);
+        // Redirect to the page displaying the updated data or any other desired location
+        header("Location: lista_instructores.php");
+        exit();
+    }
 
-    $extension = pathinfo($imagen["name"], PATHINFO_EXTENSION);
-    $foto = $nombre . "-" . $fecha . "." . $extension;
-
-    move_uploaded_file($imagen["tmp_name"], "../../../images/$foto");
-
-    $validar = $conectar->prepare("SELECT codigo_barras FROM herrramienta WHERE codigo_barras = ?");
-    $validar->execute([$codigo_barras]);
-    $fila1 = $validar->fetch();
-
-    if ($nombre == "" || $tipo == "" || $codigo_barras == "") {
-        echo '<script> alert ("EXISTEN DATOS VACIOS");</script>';
-        echo '<script> window.location="crear_herramientas.php"</script>';
-    } else if ($fila1) {
-        echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
-        echo '<script> window.location= "lista.php"</script>';
-    } else {
-        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras) VALUES (?, ?, ?, 'no prestada', ?)");
-        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras]);
-        echo '<script>alert ("Registro Exitoso");</script>';
-        echo '<script> window.location= "lista.php"</script>';
+    // Retrieve existing data for the selected record
+    else {
     }
 }
-
-
-// Consulta para obtener los tipos de armas
-$tiposherrasQuery = $conectar->prepare("SELECT id_cate,categoria FROM categoria");
-$tiposherrasQuery->execute();
-$tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -107,41 +93,44 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
-    </header>
-    <main class="contenedor sombra">
-        <div class="container mt-5">
-            <h2>Crear Herramienta</h2>
-            <form method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="nombre">Nombre de la herramienta:</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
-                </div>
-                <div class="form-group">
+    </header> <!-- ... (your existing body content) ... -->
 
-
-
-                    <div class="form-group">
-                        <label for="tipo">Tipo de herramienta:</label>
-                        <select class="form-control" id="tipo" name="tipo" required>
-                            <option value="" disabled selected>Selecciona un tipo de arma</option> <!-- Placeholder -->
+    <section class="section">
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <h2>Actualizar Empresa</h2>
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="nombre">NIT de la empresa:</label>
+                            <input type="text" class="form-control" value="<?php echo $usuario['documento']; ?>" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombre">Nombre de la empresa:</label>
+                            <input type="text" class="form-control" value="<?php echo $usuario['nombre']; ?>" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombre">Direccion:</label>
+                            <input type="text" class="form-control" value="<?php echo $usuario['email']; ?>" id="direccion" name="email" required>
+                        </div>
+                        <label for="tipo">empresa:</label>
+                        <select class="form-control" id="empresa" name="empresa">
+                            <option value="" disabled>Selecciona empresa</option> <!-- Placeholder -->
                             <?php foreach ($tiposherra as $tipoherra) : ?>
-                                <option value="<?php echo $tipoherra['id_cate']; ?>"><?php echo $tipoherra['categoria']; ?></option>
+                                <option value="<?php echo $tipoherra['nit']; ?>" <?php if ($tipoherra['nit'] == $usuario['nit']) echo 'selected'; ?>>
+                                    <?php echo $tipoherra['nombre_empre']; ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
-                    </div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="imagen">Imagen:</label>
-                        <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*" required>
-                    </div>
 
-                    <input type="submit" class="btn btn-success" value="Registrate">
-                    <input type="hidden" name="registro" value="formu">
-                    <a href="lista.php" class="btn btn-danger">Volver</a>
-            </form>
+                <button type="submit" class="btn btn-success" style="margin-top:1rem; margin-left:1.6em;">Actualizar</button>
+                </form>
+            </div>
         </div>
-    </main>
-    <!-- footer -->
+        </div>
+    </section>
     <footer>
         <div class="footer">
             <div class="container">
@@ -203,6 +192,13 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
     <!-- sidebar -->
     <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
     <script src="js/custom.js"></script>
+</body>
+
+</html>
+
+<!-- ... (your existing script imports) ... -->
+
+<!-- ... (your existing script content) ... -->
 </body>
 
 </html>

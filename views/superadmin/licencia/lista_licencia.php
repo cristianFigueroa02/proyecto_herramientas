@@ -113,7 +113,7 @@
                     <?php } ?>
                 </tbody>
             </table>
-            <a href="../index.php" class="btn btn-secondary">Regresar</a>
+            <a href="../index.php" class="btn btn-danger">Regresar</a>
         </div>
         <!-- footer -->
         <footer>

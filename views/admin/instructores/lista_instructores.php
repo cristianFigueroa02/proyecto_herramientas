@@ -3,55 +3,31 @@ require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
-require '../../../vendor/autoload.php';
 
-use Picqer\Barcode\BarcodeGeneratorPNG;
+// Verifica si la clave 'documento' está definida en la sesión antes de usarla
+if (isset($_SESSION['documento'])) {
+    $documento = $_SESSION['documento'];
 
-if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
-    $nombre = $_POST['nombre'];
-    $tipo = $_POST['tipo'];
-    $imagen = $_FILES['imagen'];
 
-    // Generar un código de barras único
-    $codigo_barras = uniqid() . rand(1000, 9999);
+    $usuarioQuery = $conectar->prepare("SELECT * FROM usuario WHERE documento = '$documento'");
+    $usuarioQuery->execute();
+    $usuario = $usuarioQuery->fetch();
 
-    $generator = new BarcodeGeneratorPNG();
-    $codigo_barras_imagen = $generator->getBarcode($codigo_barras, $generator::TYPE_CODE_128);
-
-    // Guardar el código de barras en un archivo
-    file_put_contents(__DIR__ . '/../../../images/' . $codigo_barras . '.png', $codigo_barras_imagen);
-
-    $fecha = date('Y-m-d');
-
-    $extension = pathinfo($imagen["name"], PATHINFO_EXTENSION);
-    $foto = $nombre . "-" . $fecha . "." . $extension;
-
-    move_uploaded_file($imagen["tmp_name"], "../../../images/$foto");
-
-    $validar = $conectar->prepare("SELECT codigo_barras FROM herrramienta WHERE codigo_barras = ?");
-    $validar->execute([$codigo_barras]);
-    $fila1 = $validar->fetch();
-
-    if ($nombre == "" || $tipo == "" || $codigo_barras == "") {
-        echo '<script> alert ("EXISTEN DATOS VACIOS");</script>';
-        echo '<script> window.location="crear_herramientas.php"</script>';
-    } else if ($fila1) {
-        echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
-        echo '<script> window.location= "lista.php"</script>';
-    } else {
-        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras) VALUES (?, ?, ?, 'no prestada', ?)");
-        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras]);
-        echo '<script>alert ("Registro Exitoso");</script>';
-        echo '<script> window.location= "lista.php"</script>';
-    }
+    $usua = $conectar->prepare("
+        SELECT * 
+        FROM usuario
+        INNER JOIN empresa ON usuario.nit=empresa.nit
+        INNER JOIN rol ON usuario.id_rol = rol.id_rol
+        WHERE usuario.id_rol = 4
+    ");
+    $usua->execute();
+    $asigna = $usua->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    // Manejo de error si 'documento' no está definido en la sesión
+    echo "Error: El documento no está definido en la sesión.";
 }
-
-
-// Consulta para obtener los tipos de armas
-$tiposherrasQuery = $conectar->prepare("SELECT id_cate,categoria FROM categoria");
-$tiposherrasQuery->execute();
-$tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -84,8 +60,8 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 </head>
 
 <body class="main-layout in_page">
@@ -101,6 +77,7 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="logo">
                                     <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
+                                <h2 class="titulo-principal" style="color:#000;">Bienvenido Administrador <?= $usuario['nombre']; ?> </h2>
                             </div>
                         </div>
                     </div>
@@ -108,39 +85,40 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </header>
-    <main class="contenedor sombra">
-        <div class="container mt-5">
-            <h2>Crear Herramienta</h2>
-            <form method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="nombre">Nombre de la herramienta:</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
-                </div>
-                <div class="form-group">
 
+    <div class="container mt-3">
+        <a href="crear_instructor.php" class="btn btn-success mb-2">Crea un instructor</a>
 
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr style="text-transform: uppercase;">
+                    <th>Documento</th>
+                    <th>Nombre</th>
+                    <th>Direccion</th>
+                    <th>Empresa</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
 
-                    <div class="form-group">
-                        <label for="tipo">Tipo de herramienta:</label>
-                        <select class="form-control" id="tipo" name="tipo" required>
-                            <option value="" disabled selected>Selecciona un tipo de arma</option> <!-- Placeholder -->
-                            <?php foreach ($tiposherra as $tipoherra) : ?>
-                                <option value="<?php echo $tipoherra['id_cate']; ?>"><?php echo $tipoherra['categoria']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="imagen">Imagen:</label>
-                        <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*" required>
-                    </div>
-
-                    <input type="submit" class="btn btn-success" value="Registrate">
-                    <input type="hidden" name="registro" value="formu">
-                    <a href="lista.php" class="btn btn-danger">Volver</a>
-            </form>
-        </div>
-    </main>
+                <?php foreach ($asigna as $usua) { ?>
+                    <tr>
+                        <td><?= $usua["documento"] ?></td>
+                        <td><?= $usua["nombre"] ?></td>
+                        <td><?= $usua["email"] ?></td>
+                        <td><?= $usua["nombre_empre"] ?></td>
+                        <td><?= $usua["estado"] ?></td>
+                        <td>
+                            <a href="editar_instructor.php?id=<?= $usua["documento"] ?>" class="btn btn-primary ">Actualizar</a>
+                            <a href="eliminar_instructor.php?id=<?= $usua["documento"] ?>" class="btn btn-danger">Eliminar</a>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+        <a href="../index.php" class="btn btn-danger">Regresar</a>
+    </div>
     <!-- footer -->
     <footer>
         <div class="footer">

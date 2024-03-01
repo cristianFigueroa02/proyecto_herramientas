@@ -1,57 +1,23 @@
 <?php
-require_once("../../../bd/database.php");
+require_once("../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
-require '../../../vendor/autoload.php';
 
-use Picqer\Barcode\BarcodeGeneratorPNG;
+// Verifica si la clave 'documento' está definida en la sesión antes de usarla
+if (isset($_SESSION['documento'])) {
+    $documento = $_SESSION['documento'];
 
-if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
-    $nombre = $_POST['nombre'];
-    $tipo = $_POST['tipo'];
-    $imagen = $_FILES['imagen'];
 
-    // Generar un código de barras único
-    $codigo_barras = uniqid() . rand(1000, 9999);
-
-    $generator = new BarcodeGeneratorPNG();
-    $codigo_barras_imagen = $generator->getBarcode($codigo_barras, $generator::TYPE_CODE_128);
-
-    // Guardar el código de barras en un archivo
-    file_put_contents(__DIR__ . '/../../../images/' . $codigo_barras . '.png', $codigo_barras_imagen);
-
-    $fecha = date('Y-m-d');
-
-    $extension = pathinfo($imagen["name"], PATHINFO_EXTENSION);
-    $foto = $nombre . "-" . $fecha . "." . $extension;
-
-    move_uploaded_file($imagen["tmp_name"], "../../../images/$foto");
-
-    $validar = $conectar->prepare("SELECT codigo_barras FROM herrramienta WHERE codigo_barras = ?");
-    $validar->execute([$codigo_barras]);
-    $fila1 = $validar->fetch();
-
-    if ($nombre == "" || $tipo == "" || $codigo_barras == "") {
-        echo '<script> alert ("EXISTEN DATOS VACIOS");</script>';
-        echo '<script> window.location="crear_herramientas.php"</script>';
-    } else if ($fila1) {
-        echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
-        echo '<script> window.location= "lista.php"</script>';
-    } else {
-        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras) VALUES (?, ?, ?, 'no prestada', ?)");
-        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras]);
-        echo '<script>alert ("Registro Exitoso");</script>';
-        echo '<script> window.location= "lista.php"</script>';
-    }
+    $usuarioQuery = $conectar->prepare("SELECT * FROM usuario WHERE documento = '$documento'");
+    $usuarioQuery->execute();
+    $usuario = $usuarioQuery->fetch();
+} else {
+    // Manejo de error si 'documento' no está definido en la sesión
+    echo "Error: El documento no está definido en la sesión.";
 }
-
-
-// Consulta para obtener los tipos de armas
-$tiposherrasQuery = $conectar->prepare("SELECT id_cate,categoria FROM categoria");
-$tiposherrasQuery->execute();
-$tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -71,15 +37,15 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
     <!-- bootstrap css -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- style css -->
-    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../css/style.css">
     <!-- Responsive-->
-    <link rel="stylesheet" href="../../../css/responsive.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
     <!-- styles usuario -->
-    <link rel="stylesheet" href="../../../css/styles_usuario.css">
+    <link rel="stylesheet" href="../../css/styles_instructor.css">
     <!-- fevicon -->
-    <link rel="icon" href="../../../images/fevicon.png" type="image/gif" />
+    <link rel="icon" href="../../images/fevicon.png" type="image/gif" />
     <!-- Scrollbar Custom CSS -->
-    <link rel="stylesheet" href="../../../css/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" href="../../css/jquery.mCustomScrollbar.min.css">
     <!-- Tweaks for older IEs-->
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
@@ -99,8 +65,9 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="index.html"><img src="../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
+                                <h2 class="titulo-principal" style="color:#000;">Bienvenido instructor <?= $usuario['nombre']; ?> </h2>
                             </div>
                         </div>
                     </div>
@@ -109,38 +76,53 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </header>
     <main class="contenedor sombra">
-        <div class="container mt-5">
-            <h2>Crear Herramienta</h2>
-            <form method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="nombre">Nombre de la herramienta:</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
-                </div>
-                <div class="form-group">
-
-
-
-                    <div class="form-group">
-                        <label for="tipo">Tipo de herramienta:</label>
-                        <select class="form-control" id="tipo" name="tipo" required>
-                            <option value="" disabled selected>Selecciona un tipo de arma</option> <!-- Placeholder -->
-                            <?php foreach ($tiposherra as $tipoherra) : ?>
-                                <option value="<?php echo $tipoherra['id_cate']; ?>"><?php echo $tipoherra['categoria']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
+        <div class="servicios">
+            <a href="prestamos/prestamos.php" class="enlace-servicio">
+                <section class="servicio">
+                    <h3 style="text-transform: uppercase;">prestamos</h3>
+                    <div class="iconos">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building-bank" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M3 21l18 0" />
+                            <path d="M3 10l18 0" />
+                            <path d="M5 6l7 -3l7 3" />
+                            <path d="M4 10l0 11" />
+                            <path d="M20 10l0 11" />
+                            <path d="M8 14l0 3" />
+                            <path d="M12 14l0 3" />
+                            <path d="M16 14l0 3" />
+                        </svg>
                     </div>
-
-                    <div class="form-group">
-                        <label for="imagen">Imagen:</label>
-                        <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*" required>
+                    <p> lista de prestamos y seguimiento </p>
+                </section>
+            </a>
+            <a href="lista_herramientas/lista.php" class="enlace-servicio">
+                <section class="servicio">
+                    <h3 style="text-transform: uppercase;">Lista de herramientas</h3>
+                    <div class="iconos">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tool" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
+                        </svg>
                     </div>
-
-                    <input type="submit" class="btn btn-success" value="Registrate">
-                    <input type="hidden" name="registro" value="formu">
-                    <a href="lista.php" class="btn btn-danger">Volver</a>
-            </form>
-        </div>
+                    <p> lista,creacion,actualizacion y eliminacion de herramientas </p>
+                </section>
+            </a><!-- Añadido el cierre de la etiqueta a -->
+            <a href="#" class="enlace-servicio">
+                <section class="servicio">
+                    <h3 style="text-transform: uppercase;">Devoluciones</h3>
+                    <div class="iconos">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-receipt-refund" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2" />
+                            <path d="M15 14v-2a2 2 0 0 0 -2 -2h-4l2 -2m0 4l-2 -2" />
+                        </svg>
+                    </div>
+                    <p> lista de devoluciones y reportes </p>
+                </section>
+            </a>
     </main>
+    <a href="cerrar_sesion.php" style="display: flex; justify-content:flex-end;">Cerrar sesión</a>
     <!-- footer -->
     <footer>
         <div class="footer">

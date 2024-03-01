@@ -12,7 +12,6 @@ if (isset($_SESSION['documento'])) {
     $usuarioQuery = $conectar->prepare("SELECT * FROM usuario WHERE documento = '$documento'");
     $usuarioQuery->execute();
     $usuario = $usuarioQuery->fetch();
-    
 } else {
     // Manejo de error si 'documento' no está definido en la sesión
     echo "Error: El documento no está definido en la sesión.";
@@ -68,7 +67,7 @@ if (isset($_SESSION['documento'])) {
                                 <div class="logo">
                                     <a href="index.html"><img src="../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
-                                <h2 class="titulo_principal"style="color:#000;">Bienvenido SuperAdministrador <?= $usuario['nombre']; ?> </h2>
+                                <h2 class="titulo_principal" style="color:#000;">Bienvenido SuperAdministrador <?= $usuario['nombre']; ?> </h2>
                             </div>
                         </div>
                     </div>
@@ -77,7 +76,7 @@ if (isset($_SESSION['documento'])) {
         </div>
     </header>
     <main class="contenedor sombra">
-        <div class="servicios">
+        <div class="servicios" style="display: flex; justify-content:center">
             <a href="licencia/lista_licencia.php" class="enlace-servicio">
                 <section class="servicio">
                     <h3 style="text-transform: uppercase;">licencia</h3>
@@ -90,39 +89,22 @@ if (isset($_SESSION['documento'])) {
                             <circle cx="16.5" cy="10.5" r=".5" fill="currentColor" />
                         </svg>
                     </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
+                    <p> Crea,activa y desactiva las licencias para las empresas </p>
                 </section>
-            </a> 
-            <a href="roles/roles.php" class="enlace-servicio">
-                <section class="servicio">
-                    <h3 style="text-transform: uppercase;">roles</h3>
-                    <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-palette" width="40" height="40" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <path d="M12 21a9 9 0 1 1 0 -18a9 8 0 0 1 9 8a4.5 4 0 0 1 -4.5 4h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" />
-                            <circle cx="7.5" cy="10.5" r=".5" fill="currentColor" />
-                            <circle cx="12" cy="7.5" r=".5" fill="currentColor" />
-                            <circle cx="16.5" cy="10.5" r=".5" fill="currentColor" />
-                        </svg>
-                    </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
-                </section>
-            </a><!-- Añadido el cierre de la etiqueta a -->
+            </a>
             <a href="empresas/lista_empresa.php" class="enlace-servicio">
                 <section class="servicio">
-                    <h3 style="text-transform: uppercase;">empresas</h3>
+                    <h3 style="text-transform: uppercase;">Empresas</h3>
                     <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-credit-card" width="40" height="40" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <rect x="3" y="5" width="18" height="14" rx="3" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                            <line x1="7" y1="15" x2="7.01" y2="15" />
-                            <line x1="11" y1="15" x2="13" y2="15" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trademark" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M4.5 9h5m-2.5 0v6" />
+                            <path d="M13 15v-6l3 4l3 -4v6" />
                         </svg>
                     </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
+                    <p> lista,creacion,actualizacion y eliminacion de empresas </p>
                 </section>
-            </a> <!-- Añadido el cierre de la etiqueta a -->
+            </a>
         </div>
     </main>
     <a href="cerrar_sesion.php" style="display: flex; justify-content:flex-end;">Cerrar sesión</a>

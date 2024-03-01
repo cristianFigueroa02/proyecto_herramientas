@@ -3,54 +3,27 @@ require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
-require '../../../vendor/autoload.php';
-
-use Picqer\Barcode\BarcodeGeneratorPNG;
 
 if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
-    $nombre = $_POST['nombre'];
-    $tipo = $_POST['tipo'];
-    $imagen = $_FILES['imagen'];
 
-    // Generar un código de barras único
-    $codigo_barras = uniqid() . rand(1000, 9999);
+    $rol = $_POST['rol'];
 
-    $generator = new BarcodeGeneratorPNG();
-    $codigo_barras_imagen = $generator->getBarcode($codigo_barras, $generator::TYPE_CODE_128);
+    // Verificar si ya existe un registro con el mismo NIT
+    $validar_rol = $conectar->prepare("SELECT rol FROM rol WHERE rol = ?");
+    $validar_rol->execute([$rol]);
+    $existe_rol = $validar_rol->fetch();
 
-    // Guardar el código de barras en un archivo
-    file_put_contents(__DIR__ . '/../../../images/' . $codigo_barras . '.png', $codigo_barras_imagen);
-
-    $fecha = date('Y-m-d');
-
-    $extension = pathinfo($imagen["name"], PATHINFO_EXTENSION);
-    $foto = $nombre . "-" . $fecha . "." . $extension;
-
-    move_uploaded_file($imagen["tmp_name"], "../../../images/$foto");
-
-    $validar = $conectar->prepare("SELECT codigo_barras FROM herrramienta WHERE codigo_barras = ?");
-    $validar->execute([$codigo_barras]);
-    $fila1 = $validar->fetch();
-
-    if ($nombre == "" || $tipo == "" || $codigo_barras == "") {
-        echo '<script> alert ("EXISTEN DATOS VACIOS");</script>';
-        echo '<script> window.location="crear_herramientas.php"</script>';
-    } else if ($fila1) {
-        echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
-        echo '<script> window.location= "lista.php"</script>';
+    if ($existe_rol) {
+        echo '<script> alert ("Ya existe ese rol.");</script>';
+        echo '<script> window.location="lista_roles.php"</script>';
     } else {
-        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras) VALUES (?, ?, ?, 'no prestada', ?)");
-        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras]);
-        echo '<script>alert ("Registro Exitoso");</script>';
-        echo '<script> window.location= "lista.php"</script>';
+        // Insertar los datos en la base de datos
+        $insertsql = $conectar->prepare("INSERT INTO rol (rol) VALUES (?)");
+        $insertsql->execute([$rol]);
+        echo '<script>alert ("Registro exitoso.");</script>';
+        echo '<script> window.location= "lista_roles.php"</script>';
     }
 }
-
-
-// Consulta para obtener los tipos de armas
-$tiposherrasQuery = $conectar->prepare("SELECT id_cate,categoria FROM categoria");
-$tiposherrasQuery->execute();
-$tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -110,34 +83,15 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
     </header>
     <main class="contenedor sombra">
         <div class="container mt-5">
-            <h2>Crear Herramienta</h2>
-            <form method="POST" enctype="multipart/form-data">
+            <h2>Registro de Empresa</h2>
+            <form  method="POST">
                 <div class="form-group">
-                    <label for="nombre">Nombre de la herramienta:</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    <label for="rol">Nombre del rol:</label>
+                    <input type="text" id="rol" name="rol" class="form-control" required>
                 </div>
-                <div class="form-group">
-
-
-
-                    <div class="form-group">
-                        <label for="tipo">Tipo de herramienta:</label>
-                        <select class="form-control" id="tipo" name="tipo" required>
-                            <option value="" disabled selected>Selecciona un tipo de arma</option> <!-- Placeholder -->
-                            <?php foreach ($tiposherra as $tipoherra) : ?>
-                                <option value="<?php echo $tipoherra['id_cate']; ?>"><?php echo $tipoherra['categoria']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="imagen">Imagen:</label>
-                        <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*" required>
-                    </div>
-
-                    <input type="submit" class="btn btn-success" value="Registrate">
-                    <input type="hidden" name="registro" value="formu">
-                    <a href="lista.php" class="btn btn-danger">Volver</a>
+                <button type="submit" class="btn btn-success">Registrar</button>
+                <input type="hidden" name="registro" value="formu">
+                <a href="lista_empresas.php" class="btn btn-danger">Cancelar</a>
             </form>
         </div>
     </main>

@@ -71,7 +71,7 @@
                                     <div class="logo">
                                         <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                     </div>
-                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido Aprendiz <?= $usuario['nombre']; ?> </h2>
+                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido admin <?= $usuario['nombre']; ?> </h2>
                                 </div>
                             </div>
                         </div>
@@ -81,7 +81,7 @@
         </header>
 
         <div class="container mt-3">
-            <a href="crear_herramientas.php" class="btn btn-success mb-2">Crear un arma</a>
+            <a href="crear_herramientas.php" class="btn btn-success mb-2">Crear una herramienta</a>
 
             <table class="table table-striped table-bordered table-hover">
                 <thead class="thead-dark">
@@ -104,14 +104,14 @@
                             <td><img src="../../../images/<?=$usua["codigo_barras"] ?>.png" style="max-width: 75px;"></td>
                             <td><img src="../../../images/<?= $usua["img_herramienta"] ?>" style="max-width: 75px;"></td>
                             <td>
-                                <a href="actualizar_arma.php?id=<?= $usua["id_herramienta"] ?>" class="btn btn-primary " >Actualizar</a>
-                                <a href="eliminar_arma.php?id=<?= $usua["id_herramienta"] ?>" class="btn btn-danger">Eliminar</a>
+                                <a href="editar_herramienta.php?id=<?= $usua["id_herramienta"] ?>" class="btn btn-primary " >Actualizar</a>
+                                <a href="eliminar_herramienta.php?id=<?= $usua["id_herramienta"] ?>" class="btn btn-danger">Eliminar</a>
                             </td>
                         </tr>
                     <?php } ?>
                 </tbody>
             </table>
-            <a href="../index.php" class="btn btn-secondary">Regresar</a>
+            <a href="../index.php" class="btn btn-danger">Regresar</a>
         </div>
         <!-- footer -->
         <footer>

@@ -12,7 +12,6 @@ if (isset($_SESSION['documento'])) {
     $usuarioQuery = $conectar->prepare("SELECT * FROM usuario WHERE documento = '$documento'");
     $usuarioQuery->execute();
     $usuario = $usuarioQuery->fetch();
-    
 } else {
     // Manejo de error si 'documento' no está definido en la sesión
     echo "Error: El documento no está definido en la sesión.";
@@ -68,7 +67,7 @@ if (isset($_SESSION['documento'])) {
                                 <div class="logo">
                                     <a href="index.html"><img src="../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
-                                <h2  class="titulo-principal"style="color:#000;">Bienvenido instructor <?= $usuario['nombre']; ?> </h2>
+                                <h2 class="titulo-principal" style="color:#000;">Bienvenido administrador <?= $usuario['nombre']; ?> </h2>
                             </div>
                         </div>
                     </div>
@@ -82,45 +81,74 @@ if (isset($_SESSION['documento'])) {
                 <section class="servicio">
                     <h3 style="text-transform: uppercase;">prestamos</h3>
                     <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-palette" width="40" height="40" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <path d="M12 21a9 9 0 1 1 0 -18a9 8 0 0 1 9 8a4.5 4 0 0 1 -4.5 4h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" />
-                            <circle cx="7.5" cy="10.5" r=".5" fill="currentColor" />
-                            <circle cx="12" cy="7.5" r=".5" fill="currentColor" />
-                            <circle cx="16.5" cy="10.5" r=".5" fill="currentColor" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building-bank" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M3 21l18 0" />
+                            <path d="M3 10l18 0" />
+                            <path d="M5 6l7 -3l7 3" />
+                            <path d="M4 10l0 11" />
+                            <path d="M20 10l0 11" />
+                            <path d="M8 14l0 3" />
+                            <path d="M12 14l0 3" />
+                            <path d="M16 14l0 3" />
                         </svg>
                     </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
+                    <p> lista de prestamos y seguimiento </p>
                 </section>
-            </a> 
-            <a href="lista_herramientas/lista.php       " class="enlace-servicio">
+            </a>
+            <a href="lista_herramientas/lista.php" class="enlace-servicio">
                 <section class="servicio">
                     <h3 style="text-transform: uppercase;">Lista de herramientas</h3>
                     <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-palette" width="40" height="40" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <path d="M12 21a9 9 0 1 1 0 -18a9 8 0 0 1 9 8a4.5 4 0 0 1 -4.5 4h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" />
-                            <circle cx="7.5" cy="10.5" r=".5" fill="currentColor" />
-                            <circle cx="12" cy="7.5" r=".5" fill="currentColor" />
-                            <circle cx="16.5" cy="10.5" r=".5" fill="currentColor" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tool" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5" />
                         </svg>
                     </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
+                    <p> lista,creacion,actualizacion y eliminacion de herramientas </p>
                 </section>
             </a><!-- Añadido el cierre de la etiqueta a -->
-            <a href="tu_destinooo.html" class="enlace-servicio">
+            <a href="#" class="enlace-servicio">
                 <section class="servicio">
                     <h3 style="text-transform: uppercase;">Devoluciones</h3>
                     <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-credit-card" width="40" height="40" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <rect x="3" y="5" width="18" height="14" rx="3" />
-                            <line x1="3" y1="10" x2="21" y2="10" />
-                            <line x1="7" y1="15" x2="7.01" y2="15" />
-                            <line x1="11" y1="15" x2="13" y2="15" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-receipt-refund" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2" />
+                            <path d="M15 14v-2a2 2 0 0 0 -2 -2h-4l2 -2m0 4l-2 -2" />
                         </svg>
                     </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
+                    <p> lista de devoluciones y reportes </p>
+                </section>
+            </a>
+
+            <a href="roles/lista_roles.php" class="enlace-servicio">
+                <section class="servicio">
+                    <h3 style="text-transform: uppercase;">Roles</h3>
+                    <div class="iconos">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-edit" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                            <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
+                            <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
+                        </svg>
+                    </div>
+                    <p>lista,creacion,actualizacion y eliminacion de roles </p>
+                </section>
+            </a>
+            <a href="instructores/lista_instructores.php" class="enlace-servicio">
+                <section class="servicio">
+                    <h3 style="text-transform: uppercase;">Lista de instructores</h3>
+                    <div class="iconos">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-checklist" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M9.615 20h-2.615a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8" />
+                            <path d="M14 19l2 2l4 -4" />
+                            <path d="M9 8h4" />
+                            <path d="M9 12h2" />
+                        </svg>
+                    </div>
+                    <p>lista,creacion,actualizacion y eliminacion de instructores </p>
                 </section>
             </a> <!-- Añadido el cierre de la etiqueta a -->
         </div>

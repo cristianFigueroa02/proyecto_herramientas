@@ -22,15 +22,15 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
 
     if ($nit == "") {
         echo '<script>alert("EXISTEN CAMPOS VACÍOS");</script>';
-        echo '<script>window location="regis.php"</script>';
+        echo '<script>window location="crear_licencia.php"</script>';
     } elseif ($existe_nit) {
         echo '<script>alert("la licencia ya esxiste");</script>';
-        echo '<script>window.location="regis.php"</script>';
+        echo '<script>window.location="lista_licencia.php"</script>';
     } else {
         $insertsql = $conectar->prepare("INSERT INTO licencia (id_licencia, licencia, estado, nit) VALUES (?, ?, 'inactivo', ?)");
         $insertsql->execute([$id_licencia, $licencia, $nit]);
         echo '<script>alert ("Registro exitoso.");</script>';
-        echo '<script> window.location= "list_licencia.php"</script>';
+        echo '<script> window.location= "lista_licencia.php"</script>';
     }
 }
 ?>

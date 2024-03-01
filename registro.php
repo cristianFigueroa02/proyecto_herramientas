@@ -219,7 +219,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                </label>
             </div>
             <input type="hidden" name="MM_insert" value="formreg">
-            <button type="submit">Registrarme</button>
+            <button type="submit" class="btn btn-success" style="margin-bottom: 10px;">Registrarme</button>
          </form>
       </div>
    </main>

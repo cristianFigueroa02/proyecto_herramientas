@@ -2,63 +2,34 @@
 require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
-
-$tip_docQuery = $conectar->prepare("SELECT id_tip_doc,tipo_doc FROM tip_doc");
-$tip_docQuery->execute();
-$tiposdoc = $tip_docQuery->fetchAll(PDO::FETCH_ASSOC);
+session_start();
 
 $tip_forQuery = $conectar->prepare("SELECT id_formacion,formacion FROM formacion");
 $tip_forQuery->execute();
 $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
 
+$tip_docQuery = $conectar->prepare("SELECT * FROM usuario INNER JOIN rol ON usuario.id_rol = rol.id_rol WHERE rol.id_rol = 4");
+$tip_docQuery->execute();
+$tiposdoc = $tip_docQuery->fetchAll(PDO::FETCH_ASSOC);
 
 
 
 if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
     // Obtener datos del formulario
     $documento = $_POST["documento"];
-    $contrasena = $_POST["contrasena"];
-    $nombre = $_POST["nombre"];
-    $id_tip_doc = $_POST["id_tip_doc"];
-    $email = $_POST["email"];
     $ficha = $_POST["id_relacionados"];
-    $tyc = $_POST["tyc"];
 
-
-    $validar = $conectar->prepare("SELECT * FROM `usuario` WHERE documento = '$documento'");
-    $validar->execute();
-    $fila1 = $validar->fetch();
-
-    if ($documento == "" || $nombre == "" || $contrasena == "") {
+    if ($documento == "" || $ficha == "") {
         echo '<script>alert("EXISTEN CAMPOS VACÍOS");</script>';
-        echo '<script>window location="regis.php"</script>';
-    } else if ($tyc == "") {
-        echo '<script>alert("Debes aceptar los terminos y condiciones");</script>';
-        echo '<script>window location="regis.php"</script>';
-    } elseif ($fila1) {
-        echo '<script>alert("Documento existente");</script>';
-        echo '<script>window.location="lista_instructor.php.php"</script>';
-    } else {
-        $encriptar = password_hash($contrasena, PASSWORD_BCRYPT, ["cost" => 15]);
-
-        // Ajusta la consulta para insertar en tu nueva tabla
-        $insertsql = $conectar->prepare("INSERT INTO `usuario` (`documento`, `contraseña`, `nombre`, `id_tip_doc`, `email`, `id_rol`, `estado`, `nit`, `tyc`) 
-    VALUES (:documento, :contrasena, :nombre, :id_tip_doc, :email, 4, 'activo',123456789,:tyc)");
+        echo '<script>window location="asignacion_instructor.php"</script>';
+    }
+    else {
 
         $insertdeta = $conectar->prepare("INSERT INTO detalle_instructor(documento,ficha) VALUES (?, ?)");
         $insertdeta->execute([$documento, $ficha]);
-
-        $insertsql->bindParam(':documento', $documento);
-        $insertsql->bindParam(':contrasena', $encriptar);
-        $insertsql->bindParam(':nombre', $nombre);
-        $insertsql->bindParam(':id_tip_doc', $id_tip_doc);
-        $insertsql->bindParam(':email', $email);
-        $insertsql->bindParam(':tyc', $tyc);
-
-        $insertsql->execute();
         
         echo '<script>alert ("Registro Exitoso");</script>';
-        echo '<script> window.location= "lista.php"</script>';
+        echo '<script> window.location= "lista_instructores.php"</script>';
     }
 }
 ?>
@@ -121,35 +92,20 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
         <main>
             <div class="container mt-5">
                 <form method="post" action="" autocomplete="off">
-                    <div class="form-group">
-                        <label for="documento">Documento:</label>
-                        <input type="text" class="form-control" id="documento" name="documento" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="id_tip_doc">Tipo de documento:</label>
-                        <select class="form-control" id="id_tip_doc" name="id_tip_doc" required>
-                            <option value="" disabled selected>Selecciona el tipo de documento</option> <!-- Placeholder -->
+
+                <div class="form-group">
+                        <label for="documento">Nombre instructor:</label>
+                        <select class="form-control" id="documento" name="documento" required>
+                            <option value="" disabled selected>Selecciona el instructor</option> <!-- Placeholder -->
                             <?php foreach ($tiposdoc as $tipo) : ?>
-                                <option value="<?php echo $tipo['id_tip_doc']; ?>"><?php echo $tipo['tipo_doc']; ?></option>
+                                <option value="<?php echo $tipo['documento']; ?>"><?php echo $tipo['nombre']; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="contrasena">Contraseña:</label>
-                        <input type="password" class="form-control" id="contrasena" name="contrasena" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="nombre">Nombre:</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
                         <label for="formacion">Formación:</label>
                         <select class="form-control" id="formacion" name="formacion">
-                            <option value="" disabled selected>Selecciona su formación</option>
+                            <option value="" disabled selected>Selecciona la formación</option>
                             <?php
                             // Obtener valores únicos de formación
                             $formaciones = array_unique(array_column($tiposfor, 'formacion'));
@@ -169,15 +125,6 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="jornada">Jornada:</label>
-                        <select class="form-control" id="jornada" name="id_jornada" required>
-                            <option value="" disabled selected>Selecciona una jornada</option>
-                            <option value="mañana">Mañana</option>
-                            <option value="tarde">Tarde</option>
-                            <option value="noche">Noche</option>
-                        </select>
-                    </div>
 
                     <script>
                         var formacionSelect = document.getElementById("formacion");
@@ -221,12 +168,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                             jornadaSelect.value = jornada;
                         }
                     </script>
-                    <div>
-                        <label>
-                            <input type="checkbox" name="tyc" value="si">
-                            <a href="#">Acepto los términos y condiciones</a>
-                        </label>
-                    </div>
+
                     <input type="hidden" name="MM_insert" value="formreg">
                     <button type="submit" class="btn btn-success">Registrarme</button>
                 </form>

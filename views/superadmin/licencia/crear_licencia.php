@@ -4,36 +4,51 @@ $db = new Database();
 $conectar = $db->conectar();
 session_start();
 
-$nitQuery = $conectar->prepare("SELECT nit,nombre_empre FROM empresa");
-$nitQuery->execute();
-$nit = $nitQuery->fetchAll(PDO::FETCH_ASSOC);
-
+$empresaQuery = $conectar->prepare("SELECT nit, nombre_empre FROM empresa");
+$empresaQuery->execute();
+$empresas = $empresaQuery->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
-    // Obtener datos del formulario
     $id_licencia = $_POST["id_licencia"];
-
     $nit = $_POST["nit"];
     $licencia = uniqid();
-
-    $validar_nit = $conectar->prepare("SELECT * FROM licencia WHERE nit = ? AND id_licencia = ?");
-    $validar_nit->execute([$nit, $id_licencia]);
-    
+    $fecha_inicio = date('Y-m-d H:i:s');
+    $fecha_fin = date('Y-m-d H:i:s', strtotime('+1 year'));
 
     if ($nit == "") {
         echo '<script>alert("EXISTEN CAMPOS VACÍOS");</script>';
         echo '<script>window location="crear_licencia.php"</script>';
-    } elseif ($existe_nit) {
-        echo '<script>alert("la licencia ya esxiste");</script>';
-        echo '<script>window.location="lista_licencia.php"</script>';
     } else {
-        $insertsql = $conectar->prepare("INSERT INTO licencia (id_licencia, licencia, estado, nit) VALUES (?, ?, 'inactivo', ?)");
-        $insertsql->execute([$id_licencia, $licencia, $nit]);
-        echo '<script>alert ("Registro exitoso.");</script>';
-        echo '<script> window.location= "lista_licencia.php"</script>';
+        // Verificar si la empresa asociada al NIT existe en la base de datos
+        $empresaExists = false;
+        $empresaQuery = $conectar->prepare("SELECT nit FROM empresa WHERE nit = ?");
+        $empresaQuery->execute([$nit]);
+        $empresa = $empresaQuery->fetch(PDO::FETCH_ASSOC);
+        
+        if ($empresa) {
+            // Verificar si la empresa ya tiene una licencia activa
+            $licenciaQuery = $conectar->prepare("SELECT COUNT(*) AS count FROM licencia WHERE nit = ? AND estado = 'activo'");
+            $licenciaQuery->execute([$nit]);
+            $licenciaCount = $licenciaQuery->fetch(PDO::FETCH_ASSOC)['count'];
+            
+            if ($licenciaCount > 0) {
+                echo '<script>alert("La empresa ya tiene una licencia activa");</script>';
+                echo '<script>window.location="crear_licencia.php"</script>';
+            } else {
+                $insertsql = $conectar->prepare("INSERT INTO licencia (id_licencia, licencia, estado, fecha_inicio, fecha_fin, nit) VALUES (?, ?, 'activo', ?, ?, ?)");
+                $insertsql->execute([$id_licencia, $licencia, $fecha_inicio, $fecha_fin, $nit]);
+                echo '<script>alert("Licencia activa con éxito");</script>';
+                echo '<script>window.location="lista_licencia.php"</script>';
+            }
+        } else {
+            echo '<script>alert("La empresa asociada al NIT ingresado no existe en la base de datos");</script>';
+            echo '<script>window.location="crear_licencia.php"</script>';
+        }
     }
 }
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -99,15 +114,15 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                         <label for="nit">ID licencia</label>
                         <input type="number" id="id_licencia" name="id_licencia" class="form-control" required>
                     </div>
-                    <label for="id_tip_doc">Tipo de documento:</label>
+                    <label for="id_tip_doc">Empresa:</label>
                     <select class="form-control" id="nit" name="nit" required>
                         <option value="" disabled selected>Selecciona la empresa</option> <!-- Placeholder -->
-                        <?php foreach ($nit as $tipo) : ?>
+                        <?php foreach ($empresas as $tipo) : ?>
                             <option value="<?php echo $tipo['nit']; ?>"><?php echo $tipo['nombre_empre']; ?></option>
                         <?php endforeach; ?>
                     </select>
                     <input type="hidden" name="MM_insert" value="formreg">
-                    <button type="submit">Registrarme</button>
+                    <button type="submit" class="btn btn-success" style="margin-top: 10px;">Registrarme</button>
             </form>
         </div>
     </main>

@@ -150,8 +150,25 @@ if (isset($_SESSION['documento'])) {
                     </div>
                     <p>lista,creacion,actualizacion y eliminacion de instructores </p>
                 </section>
-            </a> <!-- Añadido el cierre de la etiqueta a -->
+            </a>
+
+            <a href="formaciones/lista_formaciones.php" class="enlace-servicio">
+                <section class="servicio">
+                    <h3 style="text-transform: uppercase;">Lista de formaciones</h3>
+                    <div class="iconos">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-checklist" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M9.615 20h-2.615a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8" />
+                            <path d="M14 19l2 2l4 -4" />
+                            <path d="M9 8h4" />
+                            <path d="M9 12h2" />
+                        </svg>
+                    </div>
+                    <p>lista,creacion,actualizacion y eliminacion de formaciones </p>
+                </section>
+            </a> <!-- Añadido el cierre de la etiqueta a --> <!-- Añadido el cierre de la etiqueta a -->
         </div>
+
     </main>
     <a href="cerrar_sesion.php" style="display: flex; justify-content:flex-end;">Cerrar sesión</a>
     <!-- footer -->

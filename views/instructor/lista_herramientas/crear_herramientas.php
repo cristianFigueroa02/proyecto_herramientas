@@ -39,7 +39,7 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
         echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
         echo '<script> window.location= "lista.php"</script>';
     } else {
-        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras) VALUES (?, ?, ?, 'no prestada', ?)");
+        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras) VALUES (?, ?, ?, 'sin prestamo', ?)");
         $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras]);
         echo '<script>alert ("Registro Exitoso");</script>';
         echo '<script> window.location= "lista.php"</script>';

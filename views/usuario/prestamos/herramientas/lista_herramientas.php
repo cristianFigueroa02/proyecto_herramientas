@@ -1,5 +1,5 @@
 <?php
-require_once("../../../bd/database.php");
+require_once("../../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
@@ -12,6 +12,10 @@ if (isset($_SESSION['documento'])) {
     $usuarioQuery = $conectar->prepare("SELECT * FROM usuario WHERE documento = '$documento'");
     $usuarioQuery->execute();
     $usuario = $usuarioQuery->fetch();
+
+    $usua = $conectar->prepare("SELECT * FROM herrramienta,categoria WHERE herrramienta.id_cate = categoria.id_cate AND estado = 'sin prestamo'");
+    $usua->execute();
+    $asigna = $usua->fetchAll(PDO::FETCH_ASSOC);
 } else {
     // Manejo de error si 'documento' no está definido en la sesión
     echo "Error: El documento no está definido en la sesión.";
@@ -37,21 +41,21 @@ if (isset($_SESSION['documento'])) {
     <!-- bootstrap css -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- style css -->
-    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../../css/style.css">
     <!-- Responsive-->
-    <link rel="stylesheet" href="../../../css/responsive.css">
+    <link rel="stylesheet" href="../../../../css/responsive.css">
     <!-- styles usuario -->
-    <link rel="stylesheet" href="../../../css/styles_usuario.css">
+    <link rel="stylesheet" href="../../../../css/styles_usuario.css">
     <!-- fevicon -->
-    <link rel="icon" href="../../../images/fevicon.png" type="image/gif" />
+    <link rel="icon" href="../../../../images/fevicon.png" type="image/gif" />
     <!-- Scrollbar Custom CSS -->
-    <link rel="stylesheet" href="../../../css/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" href="../../../../css/jquery.mCustomScrollbar.min.css">
     <!-- Tweaks for older IEs-->
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 </head>
 
 <body class="main-layout in_page">
@@ -65,7 +69,7 @@ if (isset($_SESSION['documento'])) {
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="../prestamos.php"><img src="../../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
                             </div>
                         </div>
@@ -74,44 +78,46 @@ if (isset($_SESSION['documento'])) {
             </div>
         </div>
     </header>
-    <main class="contenedor sombra">
-        <div class="servicios">
-            <a href="herramientas/lista_herramientas.php" class="enlace-servicio">
-                <section class="servicio">
-                    <h3 style="text-transform: uppercase;">herramienta para prestamos</h3>
-                    <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building-bank" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M3 21l18 0" />
-                            <path d="M3 10l18 0" />
-                            <path d="M5 6l7 -3l7 3" />
-                            <path d="M4 10l0 11" />
-                            <path d="M20 10l0 11" />
-                            <path d="M8 14l0 3" />
-                            <path d="M12 14l0 3" />
-                            <path d="M16 14l0 3" />
-                        </svg>
-                    </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
-                </section>
-            </a> <!-- Añadido el cierre de la etiqueta a -->
-            <a href="tu_destinooo.html" class="enlace-servicio">
-                <section class="servicio">
-                    <h3 style="text-transform: uppercase;">tus prestamos</h3>
-                    <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-receipt-refund" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2" />
-                            <path d="M15 14v-2a2 2 0 0 0 -2 -2h-4l2 -2m0 4l-2 -2" />
-                        </svg>
-                    </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
-                </section>
-            </a> <!-- Añadido el cierre de la etiqueta a -->
+
+    <div class="container mt-3">
+        <h2>Herramientas disponibles</h2>
+
+        <div class="table-responsive">
+            <form method="post">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr style="text-transform: uppercase;">
+                            <th>Nombre</th>
+                            <th>Tipo de herramienta</th>
+                            <th>Estado</th>
+                            <th>Código de barras</th>
+                            <th>Imagen</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($asigna as $usua) { ?>
+                            <tr>
+                                <td><?= $usua["nombre_he"] ?></td>
+                                <td><?= $usua["categoria"] ?></td>
+                                <td><?= $usua["estado"] ?></td>
+                                <td><img src="../../../../images/<?= $usua["codigo_barras"] ?>.png" style="max-width: 75px;"></td>
+                                <td><img src="../../../../images/<?= $usua["img_herramienta"] ?>" style="max-width: 75px;"></td>
+                                <td>
+                                    <input type="checkbox" name="ids[]" value="<?= $usua["id_herramienta"] ?>">
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-primary">Prestar seleccionados</button>
+            </form>
         </div>
-    </main>
-    <a href="../index.php" class="btn btn-danger" style="margin-bottom: 10px;">Regresar</a>
-    <a href="cerrar_sesion.php" style="display: flex; justify-content:flex-end;">Cerrar sesión</a>
+
+
+        <a href="../prestamos.php   " class="btn btn-danger" style="margin-bottom: 10px;">Regresar</a>
+    </div>
+
     <!-- footer -->
     <footer>
         <div class="footer">

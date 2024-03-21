@@ -4,20 +4,26 @@ $db = new Database();
 $conectar = $db->conectar();
 session_start();
 
-// Verifica si la clave 'documento' está definida en la sesión antes de usarla
-if (isset($_SESSION['documento'])) {
-    $documento = $_SESSION['documento'];
+if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
+    $ficha = $_POST["ficha"];
+    $nombre = $_POST['nombre'];
+    $jornada = $_POST['jornada'];
 
-
-    $usuarioQuery = $conectar->prepare("SELECT * FROM usuario WHERE documento = '$documento'");
-    $usuarioQuery->execute();
-    $usuario = $usuarioQuery->fetch();
-} else {
-    // Manejo de error si 'documento' no está definido en la sesión
-    echo "Error: El documento no está definido en la sesión.";
+    if ($nombre == "" || $ficha == "" || $jornada == "") {
+        echo '<script> alert ("EXISTEN DATOS VACIOS");</script>';
+        echo '<script> window.location="crear_formacion.php"</script>';
+    } else if ($fila1) {
+        echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
+        echo '<script> window.location= "lista_formaciones.php"</script>';
+    } else {
+        $insertsql = $conectar->prepare("INSERT INTO formacion(id_formacion,formacion,jornada) VALUES (?, ?, ?)");
+        $insertsql->execute([$ficha, $nombre, $jornada]);
+        echo '<script>alert ("Registro Exitoso");</script>';
+        echo '<script> window.location= "lista_formaciones.php"</script>';
+    }
 }
-?>
 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -75,43 +81,36 @@ if (isset($_SESSION['documento'])) {
         </div>
     </header>
     <main class="contenedor sombra">
-        <div class="servicios">
-            <a href="herramientas/lista_herramientas.php" class="enlace-servicio">
-                <section class="servicio">
-                    <h3 style="text-transform: uppercase;">herramienta para prestamos</h3>
-                    <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building-bank" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M3 21l18 0" />
-                            <path d="M3 10l18 0" />
-                            <path d="M5 6l7 -3l7 3" />
-                            <path d="M4 10l0 11" />
-                            <path d="M20 10l0 11" />
-                            <path d="M8 14l0 3" />
-                            <path d="M12 14l0 3" />
-                            <path d="M16 14l0 3" />
-                        </svg>
-                    </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
-                </section>
-            </a> <!-- Añadido el cierre de la etiqueta a -->
-            <a href="tu_destinooo.html" class="enlace-servicio">
-                <section class="servicio">
-                    <h3 style="text-transform: uppercase;">tus prestamos</h3>
-                    <div class="iconos">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-receipt-refund" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2" />
-                            <path d="M15 14v-2a2 2 0 0 0 -2 -2h-4l2 -2m0 4l-2 -2" />
-                        </svg>
-                    </div>
-                    <p> Pellentesque odio ex, bibendum quis convallis scelerisque, eleifend vitae lectus. Quisque in erat justo. </p>
-                </section>
-            </a> <!-- Añadido el cierre de la etiqueta a -->
+        <div class="container mt-5">
+            <h2>Crear Formacion</h2>
+            <form method="POST" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label for="nombre">Ficha:</label>
+                    <input type="number" class="form-control" id="ficha" name="ficha" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre de la formacion:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="jornada">Jornada:</label>
+                    <select class="form-control" id="jornada" name="jornada" required>
+                        <option value="" disabled selected>Selecciona una jornada</option> <!-- Placeholder -->
+                        <option value="mañana">Mañana</option>
+                        <option value="tarde">Tarde</option>
+                        <option value="noche">Noche</option>
+                    </select>
+                </div>
+
+
+                <input type="submit" class="btn btn-success" value="Registrate">
+                <input type="hidden" name="registro" value="formu">
+                <a href="lista_formaciones.php" class="btn btn-danger">Volver</a>
+            </form>
         </div>
     </main>
-    <a href="../index.php" class="btn btn-danger" style="margin-bottom: 10px;">Regresar</a>
-    <a href="cerrar_sesion.php" style="display: flex; justify-content:flex-end;">Cerrar sesión</a>
     <!-- footer -->
     <footer>
         <div class="footer">

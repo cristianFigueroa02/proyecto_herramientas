@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 01-03-2024 a las 20:43:42
+-- Tiempo de generación: 21-03-2024 a las 01:28:06
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -39,6 +39,28 @@ CREATE TABLE `categoria` (
 INSERT INTO `categoria` (`id_cate`, `categoria`) VALUES
 (1, 'pesada'),
 (2, 'suave');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_instructor`
+--
+
+CREATE TABLE `detalle_instructor` (
+  `id_detalle` int(11) NOT NULL,
+  `documento` int(11) NOT NULL,
+  `ficha` int(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `detalle_instructor`
+--
+
+INSERT INTO `detalle_instructor` (`id_detalle`, `documento`, `ficha`) VALUES
+(1, 1782, 123789),
+(2, 1782, 789456),
+(3, 1782, 789456),
+(4, 123456789, 2500591);
 
 -- --------------------------------------------------------
 
@@ -85,6 +107,7 @@ CREATE TABLE `empresa` (
 --
 
 INSERT INTO `empresa` (`nit`, `nombre_empre`, `direccion`, `gmail`, `telefono`) VALUES
+(154879, 'sena sofia ', 'asdads', 'sadas@sena.com', '123456789'),
 (123456789, 'sena', 'picaleñaa', 'sena@sema.com', '3124758405');
 
 -- --------------------------------------------------------
@@ -94,17 +117,19 @@ INSERT INTO `empresa` (`nit`, `nombre_empre`, `direccion`, `gmail`, `telefono`) 
 --
 
 CREATE TABLE `formacion` (
-  `id_formacion` int(11) NOT NULL,
-  `formacion` varchar(50) DEFAULT NULL
+  `id_formacion` int(6) NOT NULL,
+  `formacion` varchar(50) DEFAULT NULL,
+  `jornada` enum('mañana','tarde','noche','') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `formacion`
 --
 
-INSERT INTO `formacion` (`id_formacion`, `formacion`) VALUES
-(1, 'construccion'),
-(2, 'alturas');
+INSERT INTO `formacion` (`id_formacion`, `formacion`, `jornada`) VALUES
+(123789, 'alturasa', 'mañana'),
+(789456, 'alturasa', 'noche'),
+(2500591, 'ADSO', 'mañana');
 
 -- --------------------------------------------------------
 
@@ -117,7 +142,7 @@ CREATE TABLE `herrramienta` (
   `nombre_he` varchar(40) DEFAULT NULL,
   `id_cate` int(11) DEFAULT NULL,
   `img_herramienta` text NOT NULL,
-  `estado` varchar(50) DEFAULT NULL,
+  `estado` enum('sin prestamo','prestado','en proceso','') DEFAULT NULL,
   `codigo_barras` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -126,29 +151,9 @@ CREATE TABLE `herrramienta` (
 --
 
 INSERT INTO `herrramienta` (`id_herramienta`, `nombre_he`, `id_cate`, `img_herramienta`, `estado`, `codigo_barras`) VALUES
-(10, 'gordoaaaa', NULL, 'gordo-2024-02-20.png', 'no prestada', '65d49dc6c799c2132'),
-(11, 'armerogolll', NULL, 'armerogol-2024-02-20.png', 'no prestada', '65d4a1023b8cb9668'),
-(12, 'ojaniii', 2, 'ojani-2024-02-20.png', 'no prestada', '65d4a31031e443877');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `jornada`
---
-
-CREATE TABLE `jornada` (
-  `id_jornada` int(11) NOT NULL,
-  `jornada` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `jornada`
---
-
-INSERT INTO `jornada` (`id_jornada`, `jornada`) VALUES
-(1, 'mañana'),
-(2, 'tarde'),
-(3, 'noche');
+(10, 'gordoaaaa', NULL, 'gordo-2024-02-20.png', '', '65d49dc6c799c2132'),
+(11, 'armerogolll', 2, 'armerogol-2024-02-20.png', 'sin prestamo', '65d4a1023b8cb9668'),
+(12, 'ojaniii', 2, 'ojani-2024-02-20.png', 'sin prestamo', '65d4a31031e443877');
 
 -- --------------------------------------------------------
 
@@ -171,8 +176,7 @@ CREATE TABLE `licencia` (
 
 INSERT INTO `licencia` (`id_licencia`, `licencia`, `estado`, `fecha_inicio`, `fecha_fin`, `nit`) VALUES
 (1, '123456', 'activo', '2024-02-26 16:43:18', '2025-02-26 16:43:18', 123456789),
-(2, '65dc871872a74', 'activo', '2024-02-26 16:24:43', '2025-02-26 16:24:43', 123456),
-(3, '65dcadca6dfcb', 'activo', '2024-02-26 16:27:29', '2025-02-26 16:27:29', 456789);
+(15, '65e88323d19aa', 'activo', '2024-03-06 15:52:19', '2025-03-06 15:52:19', 154879);
 
 -- --------------------------------------------------------
 
@@ -267,8 +271,13 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`documento`, `contraseña`, `nombre`, `id_tip_doc`, `email`, `id_formacion`, `ficha`, `id_rol`, `id_jornada`, `estado`, `nit`, `tyc`) VALUES
+(1489, '$2y$15$IgIYfYbKz.MwPPDTHxK3Uuc9OLqeyZ32XNU1XybEPBgxvxE.OKzeO', 'aer', 1, 'ae@sena.com', NULL, NULL, 4, NULL, 'activo', 123456789, 'si'),
+(1782, '$2y$15$J6xTonkYXrHt0/EfKHSY.OA79HVdu8z0G0H1QSeFDLM8gqFMfni4O', 'sena', 1, 'sena@sena.com', NULL, NULL, 4, NULL, 'activo', 123456789, 'si'),
+(121212, '$2y$15$iW6fryIRTrg0O/8KdzeF2.L8AWH.xJv/S9GDG4rqfRJMg9t7XEILy', 'cristian', 1, 'cristian@sena.com', NULL, 2501054, 2, 1, 'activo', 123456789, 'si'),
+(123456, '$2y$15$CFsV02Sdw/fyLYXISU/oP.CirAdif2ybkXgneH25C1U8naAvAMo1K', '123', 1, 'ar@sena.com', NULL, NULL, 4, NULL, 'activo', 123456789, 'si'),
 (171717, '$2y$15$6r4pE4IwUlrwuydtZgvXaOfyBrShteuyG8FIN5cj9jhFeKC/IqL8y', 'admin', 1, 'admin@sena.com', NULL, 231321, 1, 1, 'activo', 123456789, 'si'),
-(1107975322, '$2y$15$nmOJkdLlTBmKk7gxu3zg1OpdsI5ufU8GuNdDJiEv15c4sMzQdKxXO', 'cristian figueroa', 1, 'cristianfigueroa040@gmail.com', 2, 25000, 3, 1, 'activo', 123456789, 'si');
+(123456789, '$2y$15$U/NDbxLlDsWrwc0.D5qLFuK94Alo0wxF2zXCncSASe646OOYedZoO', 'armeraaa', 1, 'a@sena.com', NULL, NULL, 4, NULL, 'activo', 123456789, 'si'),
+(1107975322, '$2y$15$nmOJkdLlTBmKk7gxu3zg1OpdsI5ufU8GuNdDJiEv15c4sMzQdKxXO', 'cristian figueroa', 1, 'cristianfigueroa040@gmail.com', NULL, 25000, 1, 1, 'activo', 123456789, 'si');
 
 --
 -- Índices para tablas volcadas
@@ -279,6 +288,12 @@ INSERT INTO `usuario` (`documento`, `contraseña`, `nombre`, `id_tip_doc`, `emai
 --
 ALTER TABLE `categoria`
   ADD PRIMARY KEY (`id_cate`);
+
+--
+-- Indices de la tabla `detalle_instructor`
+--
+ALTER TABLE `detalle_instructor`
+  ADD PRIMARY KEY (`id_detalle`);
 
 --
 -- Indices de la tabla `detalle_pres`
@@ -309,12 +324,6 @@ ALTER TABLE `formacion`
 --
 ALTER TABLE `herrramienta`
   ADD PRIMARY KEY (`id_herramienta`);
-
---
--- Indices de la tabla `jornada`
---
-ALTER TABLE `jornada`
-  ADD PRIMARY KEY (`id_jornada`);
 
 --
 -- Indices de la tabla `licencia`
@@ -354,8 +363,6 @@ ALTER TABLE `usuario`
   ADD PRIMARY KEY (`documento`),
   ADD KEY `id_tip_doc` (`id_tip_doc`),
   ADD KEY `id_rol` (`id_rol`),
-  ADD KEY `id_formacion` (`id_formacion`),
-  ADD KEY `id_jornada` (`id_jornada`),
   ADD KEY `nit` (`nit`);
 
 --
@@ -369,10 +376,10 @@ ALTER TABLE `categoria`
   MODIFY `id_cate` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT de la tabla `formacion`
+-- AUTO_INCREMENT de la tabla `detalle_instructor`
 --
-ALTER TABLE `formacion`
-  MODIFY `id_formacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `detalle_instructor`
+  MODIFY `id_detalle` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `herrramienta`
@@ -381,16 +388,10 @@ ALTER TABLE `herrramienta`
   MODIFY `id_herramienta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT de la tabla `jornada`
---
-ALTER TABLE `jornada`
-  MODIFY `id_jornada` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
-  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `tip_doc`
@@ -408,8 +409,6 @@ ALTER TABLE `tip_doc`
 ALTER TABLE `usuario`
   ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_tip_doc`) REFERENCES `tip_doc` (`id_tip_doc`),
   ADD CONSTRAINT `usuario_ibfk_2` FOREIGN KEY (`id_rol`) REFERENCES `rol` (`id_rol`),
-  ADD CONSTRAINT `usuario_ibfk_3` FOREIGN KEY (`id_formacion`) REFERENCES `formacion` (`id_formacion`),
-  ADD CONSTRAINT `usuario_ibfk_4` FOREIGN KEY (`id_jornada`) REFERENCES `jornada` (`id_jornada`),
   ADD CONSTRAINT `usuario_ibfk_5` FOREIGN KEY (`nit`) REFERENCES `empresa` (`nit`);
 COMMIT;
 

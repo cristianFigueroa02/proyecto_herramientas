@@ -89,6 +89,8 @@ if (isset($_SESSION['documento'])) {
     <div class="container mt-3">
         <a href="crear_instructor.php" class="btn btn-success mb-2">Crea un instructor</a>
 
+        <a href="asignacion_instructor.php" class="btn btn-primary mb-2">asignar instructor</a>
+
         <table class="table table-striped table-bordered table-hover">
             <thead class="thead-dark">
                 <tr style="text-transform: uppercase;">

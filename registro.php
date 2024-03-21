@@ -7,11 +7,7 @@ $tip_docQuery = $conectar->prepare("SELECT id_tip_doc,tipo_doc FROM tip_doc");
 $tip_docQuery->execute();
 $tiposdoc = $tip_docQuery->fetchAll(PDO::FETCH_ASSOC);
 
-$tip_jorQuery = $conectar->prepare("SELECT id_jornada,jornada FROM jornada");
-$tip_jorQuery->execute();
-$tiposjor = $tip_jorQuery->fetchAll(PDO::FETCH_ASSOC);
-
-$tip_forQuery = $conectar->prepare("SELECT id_formacion,formacion FROM formacion");
+$tip_forQuery = $conectar->prepare("SELECT id_formacion,formacion,jornada FROM formacion");
 $tip_forQuery->execute();
 $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
 
@@ -31,31 +27,29 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
    $id_formacion = $_POST["id_formacion"];
    $ficha = $_POST["ficha"];
    $id_jornada = $_POST["id_jornada"];
-   $nit = $_POST["nit"];
-   $tyc= $_POST["tyc"];
+   $tyc = $_POST["tyc"];
 
 
    $validar = $conectar->prepare("SELECT * FROM `usuario` WHERE documento = '$documento'");
    $validar->execute();
    $fila1 = $validar->fetch();
 
-   if ($documento == "" || $nombre == "" || $contrasena == "" ) {
+   if ($documento == "" || $nombre == "" || $contrasena == "") {
       echo '<script>alert("EXISTEN CAMPOS VACÍOS");</script>';
       echo '<script>window location="regis.php"</script>';
-   } 
-   else if($tyc ==""){
+   } else if ($tyc == "") {
       echo '<script>alert("Debes aceptar los terminos y condiciones");</script>';
       echo '<script>window location="regis.php"</script>';
-   }
-   elseif ($fila1) {
+   } elseif ($fila1) {
       echo '<script>alert("DOCUMENTO O NOMBRE YA EXISTEN, POR FAVOR, CAMBIELOS");</script>';
       echo '<script>window.location="regis.php"</script>';
    } else {
       $encriptar = password_hash($contrasena, PASSWORD_BCRYPT, ["cost" => 15]);
 
+
       // Ajusta la consulta para insertar en tu nueva tabla
-      $insertsql = $conectar->prepare("INSERT INTO `usuario` (`documento`, `contraseña`, `nombre`, `id_tip_doc`, `email`, `id_formacion`, `ficha`, `id_rol`, `id_jornada`, `estado`, `nit`, `tyc`) 
-    VALUES (:documento, :contrasena, :nombre, :id_tip_doc, :email, :id_formacion, :ficha, 2, :id_jornada, 'activo',:nit,:tyc)");
+      $insertsql = $conectar->prepare("INSERT INTO `usuario` (`documento`, `contraseña`, `nombre`, `id_tip_doc`, `email`, `id_formacion`, `ficha`, `id_rol`, `id_jornada`, `estado`, `tyc`) 
+    VALUES (:documento, :contrasena, :nombre, :id_tip_doc, :email, :id_formacion, :ficha, 2, :id_jornada, 'activo',:tyc)");
 
       $insertsql->bindParam(':documento', $documento);
       $insertsql->bindParam(':contrasena', $encriptar);
@@ -65,7 +59,6 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
       $insertsql->bindParam(':id_formacion', $id_formacion);
       $insertsql->bindParam(':ficha', $ficha);
       $insertsql->bindParam(':id_jornada', $id_jornada);
-      $insertsql->bindParam(':nit', $nit);
       $insertsql->bindParam(':tyc', $tyc);
 
       $insertsql->execute();
@@ -182,39 +175,83 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                <input type="email" class="form-control" id="email" name="email" required>
             </div>
             <div class="form-group">
-               <label for="id_formacion">Formación:</label>
-               <select class="form-control" id="id_formacion" name="id_formacion">
-                  <option value="" disabled selected>Selecciona su formacion</option> <!-- Placeholder -->
-                  <?php foreach ($tiposfor as $tipofor) : ?>
-                     <option value="<?php echo $tipofor['id_formacion']; ?>"><?php echo $tipofor['formacion']; ?></option>
-                  <?php endforeach; ?>
+               <label for="formacion">Formación:</label>
+               <select class="form-control" id="formacion" name="formacion">
+                  <option value="" disabled selected>Selecciona su formación</option>
+                  <?php
+                  // Obtener valores únicos de formación
+                  $formaciones = array_unique(array_column($tiposfor, 'formacion'));
+
+                  // Imprimir opciones
+                  foreach ($formaciones as $formacion) {
+                     echo "<option value='$formacion'>$formacion</option>";
+                  }
+                  ?>
                </select>
             </div>
+
             <div class="form-group">
-               <label for="ficha">Ficha:</label>
-               <input type="text" class="form-control" id="ficha" name="ficha" required>
-            </div>
-            <div class="form-group">
-               <label for="id_rol">Jornada:</label>
-               <select class="form-control" id="id_jornada" name="id_jornada" required>
-                  <option value="" disabled selected>Selecciona la jornada</option> <!-- Placeholder -->
-                  <?php foreach ($tiposjor as $tipojor) : ?>
-                     <option value="<?php echo $tipojor['id_jornada']; ?>"><?php echo $tipojor['jornada']; ?></option>
-                  <?php endforeach; ?>
+               <label for="id_relacionados">Ficha:</label>
+               <select class="form-control" id="id_relacionados" name="id_relacionados">
+                  <!-- Aquí se cargarán los elementos filtrados dinámicamente -->
                </select>
             </div>
+
             <div class="form-group">
-               <label for="nit">Empresa:</label>
-               <select class="form-control" id="nit" name="nit" required>
-                  <option value="" disabled selected>seleccoiona la empresa</option> <!-- Placeholder -->
-                  <?php foreach ($empresa as $empresas) : ?>
-                     <option value="<?php echo $empresas['nit']; ?>"><?php echo $empresas['nombre_empre']; ?></option>
-                  <?php endforeach; ?>
+               <label for="jornada">Jornada:</label>
+               <select class="form-control" id="jornada" name="id_jornada" required>
+                  <option value="" disabled selected>Selecciona una jornada</option>
+                  <option value="mañana">Mañana</option>
+                  <option value="tarde">Tarde</option>
+                  <option value="noche">Noche</option>
                </select>
             </div>
-            <div >
+
+            <script>
+               var formacionSelect = document.getElementById("formacion");
+               var relacionadosSelect = document.getElementById("id_relacionados");
+               var jornadaSelect = document.getElementById("jornada");
+               var datos = <?php echo json_encode($tiposfor); ?>;
+
+               formacionSelect.addEventListener("change", actualizarFichas);
+               relacionadosSelect.addEventListener("change", actualizarJornada);
+
+               function actualizarFichas() {
+                  var selectedFormacion = formacionSelect.value;
+                  relacionadosSelect.innerHTML = ''; // Limpiar las opciones existentes
+
+                  // Filtrar las fichas correspondientes a la formación seleccionada
+                  var fichas = datos.filter(function(item) {
+                     return item.formacion === selectedFormacion;
+                  });
+
+                  // Llenar el campo de selección "Ficha" con las fichas correspondientes
+                  fichas.forEach(function(item) {
+                     var option = document.createElement("option");
+                     option.text = item.id_formacion;
+                     option.value = item.id_formacion;
+                     relacionadosSelect.add(option);
+                  });
+
+                  // Actualizar la jornada al valor de la ficha seleccionada
+                  actualizarJornada();
+               }
+
+               function actualizarJornada() {
+                  var selectedIdFormacion = relacionadosSelect.value;
+
+                  // Buscar la jornada correspondiente al id_formacion seleccionado
+                  var jornada = datos.find(function(item) {
+                     return item.id_formacion === selectedIdFormacion;
+                  }).jornada;
+
+                  // Mostrar la jornada en el campo de selección "Jornada"
+                  jornadaSelect.value = jornada;
+               }
+            </script>
+            <div>
                <label>
-                  <input type="checkbox" name="tyc" value="si" >
+                  <input type="checkbox" name="tyc" value="si">
                   <a href="#">Acepto los términos y condiciones</a>
                </label>
             </div>

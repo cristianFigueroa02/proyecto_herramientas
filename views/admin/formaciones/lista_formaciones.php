@@ -13,7 +13,7 @@
         $usuarioQuery->execute();
         $usuario = $usuarioQuery->fetch();
 
-        $usua = $conectar->prepare("SELECT * FROM licencia,empresa WHERE licencia.nit=empresa.nit ");
+        $usua = $conectar->prepare("SELECT * FROM formacion");
         $usua->execute();
         $asigna = $usua->fetchAll(PDO::FETCH_ASSOC);
     } else {
@@ -71,7 +71,7 @@
                                     <div class="logo">
                                         <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                     </div>
-                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido SuperAdministrador <?= $usuario['nombre']; ?> </h2>
+                                    <h2 class="titulo-principal" style="color:#000;">Bienvenido admin <?= $usuario['nombre']; ?> </h2>
                                 </div>
                             </div>
                         </div>
@@ -81,29 +81,29 @@
         </header>
 
         <div class="container mt-3">
-            <a href="crear_licencia.php" class="btn btn-success mb-2">Crear una licencia</a>
+            <a href="crear_formacion.php" class="btn btn-success mb-2">Crear una formacion</a>
 
             <table class="table table-striped table-bordered table-hover">
                 <thead class="thead-dark">
                     <tr style="text-transform: uppercase;">
-                        <th>id licencia</th>
-                        <th>licencia</th>
-                        <th>fecha inicio</th>
-                        <th>fecha fin</th>
-                        <th>empresa</th>
-                        <th>estado</th>
+                        <th>Ficha</th>
+                        <th>Formacion</th>
+                        <th>Jornada</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     
                     <?php foreach ($asigna as $usua) { ?>
                         <tr>
-                            <td><?= $usua["id_licencia"] ?></td>
-                            <td><?= $usua["licencia"] ?></td>
-                            <td><?= $usua["fecha_inicio"] ?></td>
-                            <td><?= $usua["fecha_fin"] ?></td>
-                            <td><?= $usua["nombre_empre"] ?></td>
-                            <td><?= $usua["estado"] ?></td>
+                            <td><?= $usua["id_formacion"] ?></td>
+                            <td><?= $usua["formacion"] ?></td>
+                            <td><?= $usua["jornada"] ?></td>
+                            <td>
+                                <a href="editar_formacion.php?id=<?= $usua["id_formacion"] ?>" class="btn btn-primary " >Actualizar</a>
+                                <a href="eliminar_formaciones.php?id=<?= $usua["id_formacion"] ?>" class="btn btn-danger" onclick="return confirm('¿Deseas eliminar la formación?')">Eliminar</a>
+
+                            </td>
                         </tr>
                     <?php } ?>
                 </tbody>

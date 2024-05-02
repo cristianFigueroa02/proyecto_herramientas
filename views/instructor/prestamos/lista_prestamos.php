@@ -36,19 +36,46 @@ foreach ($asigna as $usua) {
     $id_prestamo = $usua["id_prestamo"];
 
     // Comparar la fecha de devolución con la fecha actual
-    if ($fecha_devolucion > $fecha_actual) {
+    if ($fecha_devolucion <= $fecha_actual) {
         // Actualizar el estado del préstamo a "reportado"
         $stmt_update_prestamo = $conectar->prepare("UPDATE prestamos SET estado_prestamo = 'reportado' WHERE id_prestamo = :id_prestamo");
         $stmt_update_prestamo->bindParam(':id_prestamo', $id_prestamo);
         $stmt_update_prestamo->execute();
 
         // Insertar un registro en la tabla "reportes"
+        // Insertar un registro en la tabla "reportes"
         $stmt_insert_reporte = $conectar->prepare("INSERT INTO reportes (id_prestamo, fecha_reporte, estado_reporte) VALUES (:id_prestamo, :fecha_actual, 'activo')");
         $stmt_insert_reporte->bindParam(':id_prestamo', $id_prestamo);
         $stmt_insert_reporte->bindParam(':fecha_actual', $fecha_actual);
         $stmt_insert_reporte->execute();
+
+        // Obtener el ID del último reporte insertado
+        $id_reporte = $conectar->lastInsertId();
+
+        // Obtener los datos relacionados de la tabla "detalle_pres"
+        $stmt_detalle_pres = $conectar->prepare("SELECT id_herramienta, cantidad_prestada FROM detalle_pres WHERE id_prestamo = :id_prestamo");
+        $stmt_detalle_pres->bindParam(':id_prestamo', $id_prestamo);
+        $stmt_detalle_pres->execute();
+        $detalles_pres = $stmt_detalle_pres->fetchAll(PDO::FETCH_ASSOC);
+
+        // Insertar datos en la tabla "deta_reportes"
+        $stmt_insert_deta_reportes = $conectar->prepare("INSERT INTO deta_reportes (id_reporte, id_herramienta, cantidad_reportada,descripcion) VALUES (:id_reporte, :id_herramienta, :cantidad_reportada,'paso la fecha de entrega')");
+
+        // Recorrer los resultados de "detalle_pres" e insertar en "deta_reportes"
+        foreach ($detalles_pres as $detalle_pres) {
+            $id_herramienta = $detalle_pres['id_herramienta'];
+            $cantidad_reportada = $detalle_pres['cantidad_prestada'];
+
+            // Ejecutar la inserción en "deta_reportes"
+            $stmt_insert_deta_reportes->bindParam(':id_reporte', $id_reporte);
+            $stmt_insert_deta_reportes->bindParam(':id_herramienta', $id_herramienta);
+            $stmt_insert_deta_reportes->bindParam(':cantidad_reportada', $cantidad_reportada);
+            $stmt_insert_deta_reportes->execute();
+        }
     }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -96,7 +123,7 @@ foreach ($asigna as $usua) {
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src=../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="#"><img src=../../../images/Sena_Colombia_logo.svg.png" alt="imagen sena" /></a>
                                 </div>
                             </div>
                         </div>
@@ -110,10 +137,7 @@ foreach ($asigna as $usua) {
                                 <ul class="navbar-nav mr-auto">
 
                                     <li class="nav-item active">
-                                        <a class="nav-link" href="#">tus prestamos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="lista_prestamo_reportes.php">Tus prestamos en reporte</a>
+                                        <a class="nav-link" href="#">Prestamos</a>
                                     </li>
                                 </ul>
                             </div>
@@ -125,7 +149,7 @@ foreach ($asigna as $usua) {
     </header>
 
     <div class="container mt-3">
-        <h2 style="text-transform:uppercase;">tus prestamos</h2>
+        <h2 style="text-transform:uppercase;">Prestamos</h2>
         <div class="table-responsive">
             <form method="post" id="formHerramientas" onsubmit="return validarSeleccion()" action="confirmacion_prestamo.php">
                 <table class="table table-striped table-bordered table-hover">
@@ -155,7 +179,7 @@ foreach ($asigna as $usua) {
         </div>
 
 
-        <a href="../prestamos.php   " class="btn btn-danger" style="margin-bottom: 10px;">Regresar</a>
+        <a href="../index.php   " class="btn btn-danger" style="margin-bottom: 10px;">Regresar</a>
     </div>
 
     <!-- footer -->

@@ -74,7 +74,7 @@ if (isset($_SESSION['documento'])) {
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="#"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
                                 <h2 class="titulo-principal" style="color:#000;">Bienvenido admin <?= $usuario['nombre']; ?> </h2>
                             </div>

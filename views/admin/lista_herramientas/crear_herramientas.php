@@ -35,7 +35,7 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
     move_uploaded_file($imagen["tmp_name"], "../../../images/$foto");
 
     $validar = $conectar->prepare("SELECT codigo_barras,nombre_he FROM herrramienta WHERE codigo_barras = ? OR nombre_he = ?");
-    $validar->execute([$codigo_barras,$nombre]);
+    $validar->execute([$codigo_barras, $nombre]);
     $fila1 = $validar->fetch();
 
     if ($nombre == "" || $tipo == "" || $codigo_barras == "") {
@@ -45,8 +45,8 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
         echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
         echo '<script> window.location= "lista.php"</script>';
     } else {
-        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras,cantidad) VALUES (?, ?, ?, 'disponible', ?,?)");
-        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras,$cantidad]);
+        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras,cantidad,stock) VALUES (?, ?, ?, 'disponible', ?,?,?)");
+        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras, $cantidad, $cantidad]);
         echo '<script>alert ("Registro Exitoso");</script>';
         echo '<script> window.location= "lista.php"</script>';
     }
@@ -105,7 +105,7 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="#"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
                             </div>
                         </div>
@@ -131,7 +131,7 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
                 <div class="form-group">
                     <label for="tipo">Tipo de herramienta:</label>
                     <select class="form-control" id="tipo" name="tipo" required>
-                        <option value="" disabled selected>Selecciona un tipo de arma</option> <!-- Placeholder -->
+                        <option value="" disabled selected>Selecciona un tipo de herramienta</option> <!-- Placeholder -->
                         <?php foreach ($tiposherra as $tipoherra) : ?>
                             <option value="<?php echo $tipoherra['id_cate']; ?>"><?php echo $tipoherra['categoria']; ?></option>
                         <?php endforeach; ?>

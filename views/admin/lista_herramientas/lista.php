@@ -83,7 +83,7 @@
                             <div class="full">
                                 <div class="center-desk">
                                     <div class="logo">
-                                        <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                        <a href="#"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                     </div>
                                     <h2 class="titulo-principal" style="color:#000;">Bienvenido admin <?= $usuario['nombre']; ?> </h2>
                                 </div>
@@ -119,7 +119,7 @@
                             <td><?= $usua["estado"] ?></td>
                             <td><?= $usua["cantidad"] ?></td>
                             <td><?= $usua["stock"] ?></td>
-                            <td><img src="../../../images/<?= $usua["codigo_barras"] ?>.png" style="max-width: 150px;"></td>
+                            <td><img src="../../../images/<?= $usua["codigo_barras"] ?>.png" style="max-width: 450px;"></td>
                             <td><img src="../../../images/<?= $usua["img_herramienta"] ?>" style="max-width: 75px;"></td>
                             <td>
                                 <a href="editar_herramienta.php?id=<?= $usua["id_herramienta"] ?>" class="btn btn-primary">Actualizar</a>

@@ -10,7 +10,7 @@ if (!isset($_SESSION['documento'])) {
     exit();
 }
 if (isset($_GET['id'])) {
-    
+
     $id = $_GET['id'];
 
     $validar = $conectar->prepare("SELECT * FROM formacion WHERE id_formacion = ?");
@@ -22,13 +22,20 @@ if (isset($_GET['id'])) {
         $nombre = $_POST['nombre'];
         $jornada = $_POST['jornada'];
 
-        
-        $updateQuery = $conectar->prepare("UPDATE formacion SET  id_formacion=?,formacion = ?, jornada = ? WHERE id_formacion = ?");
+        // Obtener la información actual de la formación
+        $validar = $conectar->prepare("SELECT id_formacion, formacion, jornada FROM formacion WHERE id_formacion = ?");
+        $validar->execute([$id]);
+        $herramienta_actual = $validar->fetch();
+
+        $updateQuery = $conectar->prepare("UPDATE formacion SET id_formacion = ?, formacion = ?, jornada = ? WHERE id_formacion = ?");
         $updateQuery->execute([$ficha, $nombre, $jornada, $id]);
-    
-        echo '<script>alert ("Actualizacion Exitosa");</script>';
-        echo '<script> window.location= "lista_formaciones.php"</script>';
+        echo '<script>alert("Actualización Exitosa");</script>';
+
+
+        // Redirigir después de la actualización
+        echo '<script>window.location= "lista_formaciones.php"</script>';
     }
+
 
     // Retrieve existing data for the selected record
     else {
@@ -82,7 +89,7 @@ if (isset($_GET['id'])) {
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="#"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
                             </div>
                         </div>
@@ -110,13 +117,14 @@ if (isset($_GET['id'])) {
                         </div>
                         <div class="form-group">
                             <label for="jornada">Jornada:</label>
-                            <select class="form-control" id="jornada" name="jornada" required ">
-                                <option value=" <?php echo $herramientas['jornada']; ?>" selected> <?php echo $herramientas['jornada']; ?></option>
-                                <option value="mañana">Mañana</option>
-                                <option value="tarde">Tarde</option>
-                                <option value="noche">Noche</option>
+                            <select class="form-control" id="jornada" name="jornada" required>
+                                <!-- Comparar el valor actual con los valores de las opciones -->
+                                <option value="mañana" <?php if ($herramientas['jornada'] === 'mañana') echo 'selected'; ?>>Mañana</option>
+                                <option value="tarde" <?php if ($herramientas['jornada'] === 'tarde') echo 'selected'; ?>>Tarde</option>
+                                <option value="noche" <?php if ($herramientas['jornada'] === 'noche') echo 'selected'; ?>>Noche</option>
                             </select>
                         </div>
+
 
                 </div>
 

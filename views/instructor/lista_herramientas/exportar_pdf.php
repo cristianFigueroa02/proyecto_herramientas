@@ -20,7 +20,7 @@ if (isset($_SESSION['documento'])) {
     $usuarioQuery->execute();
     $usuario = $usuarioQuery->fetch();
 
-    $usua = $conectar->prepare("SELECT * FROM herrramienta,categoria WHERE herrramienta.id_cate = categoria.id_cate");
+    $usua = $conectar->prepare("SELECT * FROM herrramienta JOIN categoria ON herrramienta.id_cate = categoria.id_cate");
     $usua->execute();
     $asigna = $usua->fetchAll(PDO::FETCH_ASSOC);
 
@@ -33,20 +33,22 @@ if (isset($_SESSION['documento'])) {
     // Establecer la fuente
     $pdf->SetFont('Arial', '', 12);
 
-    // Agregar encabezados de columna
-    $pdf->Cell(40, 10, 'Nombre');
-    $pdf->Cell(40, 10, 'Tipo de herramienta');
-    $pdf->Cell(40, 10, 'Estado');
-    $pdf->Cell(40, 10, 'Codigo de barras');
-    $pdf->Ln(); // Nueva línea
+    // Agregar encabezados de columna (sin código de barras ni imagen)
+    $pdf->Cell(50, 10, 'Nombre', 1);
+    $pdf->Cell(30, 10, 'Tipo de herramienta', 1);
+    $pdf->Cell(30, 10, 'Estado', 1);
+    $pdf->Cell(20, 10, 'Cantidad', 1);
+    $pdf->Cell(20, 10, 'Stock', 1);
+    $pdf->Ln(); // Nueva línea después de la cabecera
 
     // Agregar datos de la tabla a la hoja de cálculo
     foreach ($asigna as $usua) {
-        $pdf->Cell(40, 10, $usua["nombre_he"]);
-        $pdf->Cell(40, 10, $usua["categoria"]);
-        $pdf->Cell(40, 10, $usua["estado"]);
-        $pdf->Cell(40, 10, $usua["codigo_barras"]);
-        $pdf->Ln(); // Nueva línea
+        $pdf->Cell(50, 10, $usua["nombre_he"], 1);
+        $pdf->Cell(30, 10, $usua["categoria"], 1);
+        $pdf->Cell(30, 10, $usua["estado"], 1);
+        $pdf->Cell(20, 10, $usua["cantidad"], 1);
+        $pdf->Cell(20, 10, $usua["stock"], 1);
+        $pdf->Ln(); // Nueva línea después de cada fila
     }
 
     // Establecer el nombre del archivo PDF para descargar

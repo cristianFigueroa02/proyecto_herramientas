@@ -15,12 +15,9 @@ if (!isset($_SESSION['documento'])) {
 if (isset($_SESSION['documento'])) {
     $documento = $_SESSION['documento'];
 
-    $usuarioQuery = $conectar->prepare("SELECT * FROM usuario WHERE documento = :documento");
-    $usuarioQuery->bindParam(':documento', $documento);
-    $usuarioQuery->execute();
-    $usuario = $usuarioQuery->fetch();
-
-    $usua = $conectar->prepare("SELECT * FROM herrramienta JOIN categoria ON herrramienta.id_cate = categoria.id_cate");
+    // Consulta para obtener los datos de los préstamos
+    $usua = $conectar->prepare("SELECT * FROM prestamos WHERE documento = :documento");
+    $usua->bindParam(':documento', $documento);
     $usua->execute();
     $asigna = $usua->fetchAll(PDO::FETCH_ASSOC);
 
@@ -33,26 +30,24 @@ if (isset($_SESSION['documento'])) {
     // Establecer la fuente
     $pdf->SetFont('Arial', '', 12);
 
-    // Agregar encabezados de columna (sin código de barras ni imagen)
-    $pdf->Cell(50, 10, 'Nombre', 1);
-    $pdf->Cell(30, 10, 'Tipo de herramienta', 1);
-    $pdf->Cell(30, 10, 'Estado', 1);
-    $pdf->Cell(20, 10, 'Cantidad', 1);
-    $pdf->Cell(20, 10, 'Stock', 1);
+    // Agregar encabezados de columna
+    $pdf->Cell(40, 10, 'Documento', 1);
+    $pdf->Cell(40, 10, 'Fecha inicio préstamo', 1);
+    $pdf->Cell(40, 10, 'Fecha fin préstamo', 1);
+    $pdf->Cell(40, 10, 'Estado del préstamo', 1);
     $pdf->Ln(); // Nueva línea después de la cabecera
 
-    // Agregar datos de la tabla a la hoja de cálculo
+    // Agregar datos de la tabla al PDF
     foreach ($asigna as $usua) {
-        $pdf->Cell(50, 10, $usua["nombre_he"], 1);
-        $pdf->Cell(30, 10, $usua["categoria"], 1);
-        $pdf->Cell(30, 10, $usua["estado"], 1);
-        $pdf->Cell(20, 10, $usua["cantidad"], 1);
-        $pdf->Cell(20, 10, $usua["stock"], 1);
+        $pdf->Cell(40, 10, $usua["documento"], 1);
+        $pdf->Cell(40, 10, $usua["fecha_prestamo"], 1);
+        $pdf->Cell(40, 10, $usua["fecha_devolucion"], 1);
+        $pdf->Cell(40, 10, $usua["estado_prestamo"], 1);
         $pdf->Ln(); // Nueva línea después de cada fila
     }
 
     // Establecer el nombre del archivo PDF para descargar
-    $filename = 'reporte_herramientas.pdf';
+    $filename = 'reporte_prestamos.pdf';
 
     // Descargar el archivo PDF
     $pdf->Output($filename, 'D');

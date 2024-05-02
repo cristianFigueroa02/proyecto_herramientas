@@ -21,20 +21,32 @@ $tiposdoc = $tip_docQuery->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
     // Obtener datos del formulario
     $documento = $_POST["documento"];
-    $ficha = $_POST["id_relacionados"];
+    $ficha = $_POST["ficha"];
 
     if ($documento == "" || $ficha == "") {
         echo '<script>alert("EXISTEN CAMPOS VACÍOS");</script>';
-        echo '<script>window location="asignacion_instructor.php"</script>';
+        echo '<script>window.location="asignacion_instructor.php"</script>';
     } else {
+        // Verificar si el documento ya está asociado con la ficha en la tabla `detalle_usuarios`
+        $checkQuery = $conectar->prepare("SELECT COUNT(*) FROM detalle_usuarios WHERE documento = ? AND ficha = ?");
+        $checkQuery->execute([$documento, $ficha]);
+        $count = $checkQuery->fetchColumn();
 
-        $insertdeta = $conectar->prepare("INSERT INTO detalle_usuarios(documento,ficha) VALUES (?, ?)");
-        $insertdeta->execute([$documento, $ficha]);
+        if ($count > 0) {
+            // Si la combinación de `documento` y `ficha` ya existe, muestra un mensaje de alerta
+            echo '<script>alert("El documento ya está asociado con la ficha especificada.");</script>';
+            echo '<script>window.location="asignacion_instructor.php"</script>';
+        } else {
+            // Si la combinación de `documento` y `ficha` no existe, procede con la inserción
+            $insertdeta = $conectar->prepare("INSERT INTO detalle_usuarios(documento, ficha) VALUES (?, ?)");
+            $insertdeta->execute([$documento, $ficha]);
 
-        echo '<script>alert ("Registro Exitoso");</script>';
-        echo '<script> window.location= "lista_instructores.php"</script>';
+            echo '<script>alert("Registro exitoso");</script>';
+            echo '<script>window.location="lista_instructores.php"</script>';
+        }
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -83,7 +95,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                             <div class="full">
                                 <div class="center-desk">
                                     <div class="logo">
-                                        <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                        <a href="#"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                     </div>
                                 </div>
                             </div>
@@ -105,73 +117,60 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <div class="formulario__grupo" id="grupo__ficha">
+                        <label for="fichaInput">Ficha:</label>
+                        <input type="number" class="form-control" id="fichaInput" name="ficha" value="<?= $ficha_usuario ?>" required>
+                    </div>
+
                     <div class="form-group">
                         <label for="formacion">Formación:</label>
-                        <select class="form-control" id="formacion" name="formacion">
-                            <option value="" disabled selected>Selecciona la formación</option>
+                        <select class="form-control" id="formacion" name="formacion" required>
                             <?php
-                            // Obtener valores únicos de formación
-                            $formaciones = array_unique(array_column($tiposfor, 'formacion'));
-
-                            // Imprimir opciones
-                            foreach ($formaciones as $formacion) {
-                                echo "<option value='$formacion'>$formacion</option>";
+                            // Integrar resultados de la consulta en el select
+                            foreach ($tiposfor as $row) {
+                                echo "<option value='{$row['id_formacion']}'" . ($id_formacion_usuario == $row['id_formacion'] ? 'selected' : '') . ">{$row['formacion']}</option>";
                             }
                             ?>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="id_relacionados">Ficha:</label>
-                        <select class="form-control" id="id_relacionados" name="id_relacionados">
-                            <!-- Aquí se cargarán los elementos filtrados dinámicamente -->
-                        </select>
-                    </div>
-
 
                     <script>
+                        var fichaInput = document.getElementById("fichaInput");
                         var formacionSelect = document.getElementById("formacion");
-                        var relacionadosSelect = document.getElementById("id_relacionados");
-                        var jornadaSelect = document.getElementById("jornada");
-                        var datos = <?php echo json_encode($tiposfor); ?>;
 
-                        formacionSelect.addEventListener("change", actualizarFichas);
-                        relacionadosSelect.addEventListener("change", actualizarJornada);
+                        fichaInput.addEventListener("input", function() {
+                            var inputNumber = parseInt(fichaInput.value.trim());
 
-                        function actualizarFichas() {
-                            var selectedFormacion = formacionSelect.value;
-                            relacionadosSelect.innerHTML = ''; // Limpiar las opciones existentes
+                            // Limpiar el campo de selección de formación
+                            formacionSelect.innerHTML = '';
 
-                            // Filtrar las fichas correspondientes a la formación seleccionada
-                            var fichas = datos.filter(function(item) {
-                                return item.formacion === selectedFormacion;
-                            });
+                            // Realizar una solicitud AJAX para obtener la formación asociada al número de ficha ingresado
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("GET", "obtener_formacion.php?ficha=" + inputNumber, true);
+                            xhr.onreadystatechange = function() {
+                                if (xhr.readyState === 4 && xhr.status === 200) {
+                                    // Parsear la respuesta JSON
+                                    var response = JSON.parse(xhr.responseText);
 
-                            // Llenar el campo de selección "Ficha" con las fichas correspondientes
-                            fichas.forEach(function(item) {
-                                var option = document.createElement("option");
-                                option.text = item.id_formacion;
-                                option.value = item.id_formacion;
-                                relacionadosSelect.add(option);
-                            });
-
-                            // Actualizar la jornada al valor de la ficha seleccionada
-                            actualizarJornada();
-                        }
-
-                        function actualizarJornada() {
-                            var selectedIdFormacion = relacionadosSelect.value;
-
-                            // Buscar la jornada correspondiente al id_formacion seleccionado
-                            var jornada = datos.find(function(item) {
-                                return item.id_formacion === selectedIdFormacion;
-                            }).jornada;
-
-                            // Mostrar la jornada en el campo de selección "Jornada"
-                            jornadaSelect.value = jornada;
-                        }
+                                    // Si se encuentra una formación, agregarla como opción al campo de selección de formación
+                                    if (response) {
+                                        var option = document.createElement("option");
+                                        option.text = response.formacion;
+                                        option.value = response.formacion;
+                                        formacionSelect.add(option);
+                                    } else {
+                                        // Si no se encuentra una formación, mostrar un mensaje indicando que no se encontraron resultados
+                                        var option = document.createElement("option");
+                                        option.text = "Formación no encontrada";
+                                        option.value = "";
+                                        formacionSelect.add(option);
+                                    }
+                                }
+                            };
+                            xhr.send();
+                        });
                     </script>
-
                     <input type="hidden" name="MM_insert" value="formreg">
                     <button type="submit" class="btn btn-success">Registrarme</button>
                 </form>

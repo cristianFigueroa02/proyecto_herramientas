@@ -20,8 +20,8 @@ if (isset($_SESSION['documento'])) {
     $usua = $conectar->prepare("
         SELECT * 
         FROM usuario
-        INNER JOIN detalle_usuarios ON usuario.documento=detalle_usuarios.documento
         INNER JOIN rol ON usuario.id_rol = rol.id_rol
+        INNER JOIN detalle_usuarios ON detalle_usuarios.documento = usuario.documento
         WHERE usuario.id_rol = 4
     ");
     $usua->execute();
@@ -92,11 +92,11 @@ if (isset($_SESSION['documento'])) {
                             <div class="collapse navbar-collapse" id="navbarsExample04">
                                 <ul class="navbar-nav mr-auto">
 
-                                    <li class="nav-item">
+                                    <li class="nav-item ">
                                         <a class="nav-link" href="lista_instructores.php">Lista de instructores </a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link active" href="#">Lista de instructores asociados</a>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="#">Lista de instructores asociados</a>
                                     </li>
                                 </ul>
                             </div>
@@ -106,24 +106,35 @@ if (isset($_SESSION['documento'])) {
             </div>
         </div>
     </header>
+    <style>
+        .search-input {
+            border: 1px solid #6c757d;
+            /* Color de borde más oscuro */
+            border-radius: 0.25rem;
+            /* Bordes redondeados */
+            color: #495057;
+            /* Color de texto */
+        }
+    </style>
+
 
     <div class="container mt-3">
+        <a href="crear_instructor.php" class="btn btn-success mb-2">Crea un instructor</a>
+        <a href="asignacion_instructor.php" class="btn btn-primary mb-2">Asignar instructor</a>
 
-        <a href="asignacion_instructor.php" class="btn btn-primary mb-2">asignar instructor</a>
+        <input type="text" id="searchInput" class="form-control mb-2 search-input" placeholder="Buscar por nombre o documento">
 
-        <table class="table table-striped table-bordered table-hover">
+        <table id="instructorTable" class="table table-striped table-bordered table-hover">
             <thead class="thead-dark">
                 <tr style="text-transform: uppercase;">
                     <th>Documento</th>
                     <th>Nombre</th>
-                    <th>email</th>
-                    <th>Ficha</th>
+                    <th>Dirección</th>
+                    <th>ficha</th>
                     <th>Estado</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-
                 <?php foreach ($asigna as $usua) { ?>
                     <tr>
                         <td><?= $usua["documento"] ?></td>
@@ -131,18 +142,18 @@ if (isset($_SESSION['documento'])) {
                         <td><?= $usua["email"] ?></td>
                         <td><?= $usua["ficha"] ?></td>
                         <td><?= $usua["estado"] ?></td>
-                        <td>
-                            <a href="editar_instructor.php?id=<?= $usua["documento"] ?>" class="btn btn-primary ">Actualizar</a>
-                            <a href="eliminar_instructor.php?id=<?= $usua["documento"] ?>" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este instructor?')">Eliminar</a>
 
-                        </td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
+
         <a href="../index.php" class="btn btn-danger">Regresar</a>
-        <a href="exportar_pdf2.php" class="btn btn-primary">Generar Reporte</a>
+        <a href="exportar_pdf.php" class="btn btn-primary">Generar Reporte</a>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../../../paginacion_buscados.js"> </script>
     <!-- footer -->
     <footer>
         <div class="footer">

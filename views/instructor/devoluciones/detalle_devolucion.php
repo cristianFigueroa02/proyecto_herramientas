@@ -122,7 +122,7 @@ if (isset($_SESSION['documento'])) {
                                 <td><?= $usua["id_prestamo"] ?></td>
                                 <td><?= $usua["nombre_he"] ?></td>
                                 <td><img src="../../../images/<?= $usua["codigo_barras"] ?>.png" style="max-width: 150px;"></td>
-                                <td><?= $usua["catidad_prestada"] ?></td>
+                                <td><?= $usua["cantidad_prestada"] ?></td>
                                 <td><?= $usua["estado_prestamo"] ?></td>
                             </tr>
                         <?php } ?>

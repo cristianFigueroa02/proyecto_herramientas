@@ -227,7 +227,7 @@ $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
                               <div class="formulario__grupo">
                                  <label>
                                     <input type="checkbox" name="tyc" id="tyc" value="si" required>
-                                    Acepto los términos y condiciones
+                                    <a href="terminos.html">Acepto los términos y condiciones</a>
                                  </label>
                               </div>
                               <button type="submit" class="btn btn-success" style="margin-bottom: 10px;">Registrarme</button>

@@ -34,7 +34,6 @@ if (isset($_GET['id'])) {
 }
 ?>
 
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -82,7 +81,7 @@ if (isset($_GET['id'])) {
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="#"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
                             </div>
                         </div>
@@ -106,7 +105,7 @@ if (isset($_GET['id'])) {
                 <button type="submit" class="btn btn-success" style="margin-top:1rem; margin-left:1.6rem;">Actualizar</button>
                 </form>
             </div>
-            <a href="lista.php" class="btn btn-danger">Volver</a>
+            <a href="lista_tipos.php" class="btn btn-danger">Volver</a>
         </div>
         </div>
     </section>

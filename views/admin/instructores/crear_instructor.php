@@ -2,18 +2,18 @@
 require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
+
 session_start();
-
-
 if (!isset($_SESSION['documento'])) {
     header("Location: ../../../login.php"); // Redirigir a la página de inicio si no está logueado
     exit();
 }
-$tip_docQuery = $conectar->prepare("SELECT id_tip_doc,tipo_doc FROM tip_doc");
+
+$tip_docQuery = $conectar->prepare("SELECT id_tip_doc,tipo_doc FROM tip_doc WHERE id_tip_doc = 1");
 $tip_docQuery->execute();
 $tiposdoc = $tip_docQuery->fetchAll(PDO::FETCH_ASSOC);
 
-$tip_forQuery = $conectar->prepare("SELECT id_formacion,formacion FROM formacion");
+$tip_forQuery = $conectar->prepare("SELECT id_formacion,formacion,jornada FROM formacion");
 $tip_forQuery->execute();
 $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
 
@@ -66,12 +66,13 @@ $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
 
     .formulario__label {
         display: block;
+        font-weight: bold;
         margin-bottom: 5px;
     }
 
     .formulario__input {
         width: 100%;
-        padding: 5px;
+        padding: 10px;
         border: 1px solid #ccc;
         border-radius: 4px;
         box-sizing: border-box;
@@ -118,160 +119,151 @@ $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
     }
 </style>
 
+
 <body class="main-layout in_page">
     <!-- header -->
     <header>
         <!-- header inner -->
-        <header>
-            <!-- header inner -->
-            <div class="header">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12 col-sm-3 col logo_section">
-                            <div class="full">
-                                <div class="center-desk">
-                                    <div class="logo">
-                                        <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
-                                    </div>
+        <div class="header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 col-sm-3 col logo_section">
+                        <div class="full">
+                            <div class="center-desk">
+                                <div class="logo">
+                                    <a href="index.html"><img src="../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </header>
-        <main>
-            <div style="margin-bottom:50px;" class="container mt-5">
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="card-title text-center">Registro</h4>
+        </div>
+    </header>
+    <main>
 
-                                <form id="formulario" method="post" autocomplete="off">
-                                    <div class="formulario__grupo" id="grupo__documento">
-                                        <label for="documento" class="formulario__label">Documento:</label>
-                                        <input type="text" class="formulario__input" id="documento" name="documento" required>
-                                        <p class="formulario__input-error">El documento debe contener de 6 a 11 digitos.</p>
-                                    </div>
+        <body>
+            <main>
+                <div style="margin-bottom:50px;" class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title text-center">Registro instructor</h4>
 
-                                    <div class="formulario__grupo" id="grupo__contrasena">
-                                        <label for="contrasena" class="formulario__label">Contraseña:</label>
-                                        <input type="password" class="formulario__input" id="contrasena" name="contrasena" required>
-                                        <p class="formulario__input-error">La contraseña debe tener entre 8 y 12 caracteres.</p>
-                                    </div>
+                                    <form id="formulario" method="post" action="" autocomplete="off">
+                                        <div class="formulario__grupo" id="grupo__documento">
+                                            <label for="documento" class="formulario__label">Documento:</label>
+                                            <input type="text" class="formulario__input" id="documento" name="documento" required>
+                                            <p class="formulario__input-error">El documento debe contener de 6 a 11 digitos.</p>
+                                        </div>
 
-                                    <div class="formulario__grupo" id="grupo__nombre">
-                                        <label for="nombre" class="formulario__label">Nombres y apellidos:</label>
-                                        <input type="text" class="formulario__input" id="nombre" name="nombre" required>
-                                        <p class="formulario__input-error">El nombre debe ser válido.</p>
-                                    </div>
+                                        <div class="formulario__grupo" id="grupo__contrasena">
+                                            <label for="contrasena" class="formulario__label">Contraseña:</label>
+                                            <input type="password" class="formulario__input" id="contrasena" name="contrasena" required>
+                                            <p class="formulario__input-error">La contraseña debe tener entre 8 y 12 caracteres.</p>
+                                        </div>
 
-                                    <div class="formulario__grupo" id="grupo__email">
-                                        <label for="email" class="formulario__label">Email:</label>
-                                        <input type="email" class="formulario__input" id="email" name="email" required>
-                                        <p class="formulario__input-error">El email debe ser válido.</p>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="id_tip_doc">Tipo de documento:</label>
-                                        <select class="form-control" id="id_tip_doc" name="id_tip_doc" required>
-                                            <option value="" disabled selected>Selecciona el tipo de documento</option> <!-- Placeholder -->
-                                            <?php foreach ($tiposdoc as $tipo) : ?>
-                                                <option value="<?php echo $tipo['id_tip_doc']; ?>"><?php echo $tipo['tipo_doc']; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="formacion">Formación:</label>
-                                        <select class="form-control" id="formacion" name="formacion">
-                                            <option value="" disabled selected>Selecciona su formación</option>
-                                            <?php
-                                            // Obtener valores únicos de formación
-                                            $formaciones = array_unique(array_column($tiposfor, 'formacion'));
+                                        <div class="formulario__grupo" id="grupo__nombre">
+                                            <label for="nombre" class="formulario__label">Nombres y apellidos:</label>
+                                            <input type="text" class="formulario__input" id="nombre" name="nombre" required>
+                                            <p class="formulario__input-error">El nombre debe ser válido.</p>
+                                        </div>
 
-                                            // Imprimir opciones
-                                            foreach ($formaciones as $formacion) {
-                                                echo "<option value='$formacion'>$formacion</option>";
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
+                                        <div class="formulario__grupo" id="grupo__email">
+                                            <label for="email" class="formulario__label">Email:</label>
+                                            <input type="email" class="formulario__input" id="email" name="email" required>
+                                            <p class="formulario__input-error">El email debe ser válido.</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="id_tip_doc" class="formulario__label">Tipo de documento:</label>
+                                            <select class="form-control" id="id_tip_doc" name="id_tip_doc" required>
+                                                <option value="" disabled selected>Selecciona el tipo de documento</option> <!-- Placeholder -->
+                                                <?php foreach ($tiposdoc as $tipo) : ?>
+                                                    <option value="<?php echo $tipo['id_tip_doc']; ?>"><?php echo $tipo['tipo_doc']; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="formulario__grupo" id="grupo__ficha">
+                                            <label for="fichaInput" class="formulario__label">Ficha:</label>
+                                            <input type="number" class="formulario__input" id="fichaInput" name="ficha" required>
+                                            <p class="formulario__input-error">La ficha debe ser válida y solo debe contener numeros.</p>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="id_relacionados">Ficha:</label>
-                                        <select class="form-control" id="id_relacionados" name="id_relacionados">
-                                            <!-- Aquí se cargarán los elementos filtrados dinámicamente -->
-                                        </select>
-                                    </div>
+                                        <div class="form-group">
+                                            <label for="formacion" class="formulario__label">Formación:</label>
+                                            <select class="formulario__input" id="formacion" name="formacion">
+                                                <option value="" disabled selected>Selecciona su formación</option>
+                                                <?php
+                                                // Integrar resultados de la consulta en el select
+                                                foreach ($tiposfor as $row) {
+                                                    echo "<option value='{$row['id_formacion']}'>{$row['formacion']}</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="jornada">Jornada:</label>
-                                        <select class="form-control" id="jornada" name="id_jornada" required>
-                                            <option value="" disabled selected>Selecciona una jornada</option>
-                                            <option value="mañana">Mañana</option>
-                                            <option value="tarde">Tarde</option>
-                                            <option value="noche">Noche</option>
-                                        </select>
-                                    </div>
 
-                                    <div class="formulario__grupo">
-                                        <label>
-                                            <input type="checkbox" name="tyc" id="tyc" value="si" required>
-                                            Acepto los términos y condiciones
-                                        </label>
-                                    </div>
-                                    <button type="submit" class="btn btn-success" style="margin-bottom: 10px;">Registrarme</button>
-                                    <a href="lista_instructores.php" class="btn btn-danger">Regresar</a>
-                                </form>
+
+
+
+                                        <div class="formulario__grupo">
+                                            <label>
+                                                <input type="checkbox" name="tyc" id="tyc" value="si" required>
+                                                Acepto los términos y condiciones
+                                            </label>
+                                        </div>
+                                        <button type="submit" class="btn btn-success" style="margin-bottom: 10px;">Registrarme</button>
+                                        <a href="lista_instructores.php" class="btn btn-danger" style="margin-bottom: 10px;">volver</a>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </main>
 
-        </main>
+        </body>
+
+
         <script>
+            var fichaInput = document.getElementById("fichaInput");
             var formacionSelect = document.getElementById("formacion");
-            var relacionadosSelect = document.getElementById("id_relacionados");
-            var jornadaSelect = document.getElementById("jornada");
-            var datos = <?php echo json_encode($tiposfor); ?>;
 
-            formacionSelect.addEventListener("change", actualizarFichas);
-            relacionadosSelect.addEventListener("change", actualizarJornada);
+            fichaInput.addEventListener("input", function() {
+                var inputNumber = parseInt(fichaInput.value.trim());
 
-            function actualizarFichas() {
-                var selectedFormacion = formacionSelect.value;
-                relacionadosSelect.innerHTML = ''; // Limpiar las opciones existentes
+                // Limpiar el campo de selección de formación
+                formacionSelect.innerHTML = '';
 
-                // Filtrar las fichas correspondientes a la formación seleccionada
-                var fichas = datos.filter(function(item) {
-                    return item.formacion === selectedFormacion;
-                });
+                // Realizar una solicitud AJAX para obtener la formación asociada al número de ficha ingresado
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "obtener_formacion.php?ficha=" + inputNumber, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        // Parsear la respuesta JSON
+                        var response = JSON.parse(xhr.responseText);
 
-                // Llenar el campo de selección "Ficha" con las fichas correspondientes
-                fichas.forEach(function(item) {
-                    var option = document.createElement("option");
-                    option.text = item.id_formacion;
-                    option.value = item.id_formacion;
-                    relacionadosSelect.add(option);
-                });
-
-                // Actualizar la jornada al valor de la ficha seleccionada
-                actualizarJornada();
-            }
-
-            function actualizarJornada() {
-                var selectedIdFormacion = relacionadosSelect.value;
-
-                // Buscar la jornada correspondiente al id_formacion seleccionado
-                var jornada = datos.find(function(item) {
-                    return item.id_formacion === selectedIdFormacion;
-                }).jornada;
-
-                // Mostrar la jornada en el campo de selección "Jornada"
-                jornadaSelect.value = jornada;
-            }
+                        // Si se encuentra una formación, agregarla como opción al campo de selección de formación
+                        if (response) {
+                            var option = document.createElement("option");
+                            option.text = response.formacion;
+                            option.value = response.formacion;
+                            formacionSelect.add(option);
+                        } else {
+                            // Si no se encuentra una formación, mostrar un mensaje indicando que no se encontraron resultados
+                            var option = document.createElement("option");
+                            option.text = "Formación no encontrada";
+                            option.value = "";
+                            formacionSelect.add(option);
+                        }
+                    }
+                };
+                xhr.send();
+            });
         </script>
+
+        <script src="validacion.js"></script>
         <footer>
             <div class="footer">
                 <div class="container">
@@ -319,7 +311,6 @@ $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
         </footer>
         <!-- end footer -->
         <!-- Javascript files-->
-        <script src="validacion.js"></script>
         <script src="js/jquery.min.js"></script>
         <script src="js/bootstrap.bundle.min.js"></script>
         <script src="js/jquery-3.0.0.min.js"></script>

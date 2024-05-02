@@ -18,7 +18,7 @@ if (!isset($_SESSION['documento'])) {
 $usua = $conectar->prepare("
     SELECT * 
     FROM usuario
-    INNER JOIN detalle_instructor ON usuario.documento = detalle_instructor.documento
+    INNER JOIN detalle_usuarios ON usuario.documento = detalle_usuarios.documento
     INNER JOIN rol ON usuario.id_rol = rol.id_rol
     WHERE usuario.id_rol = 4
 ");

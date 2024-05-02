@@ -72,7 +72,7 @@ if (isset($_SESSION['documento'])) {
                         <div class="full">
                             <div class="center-desk">
                                 <div class="logo">
-                                    <a href="index.html"><img src="../../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
+                                    <a href="#"><img src="../../../../images/Sena_Colombia_logo.svg.png" alt="#" /></a>
                                 </div>
                             </div>
                         </div>
@@ -131,6 +131,7 @@ if (isset($_SESSION['documento'])) {
 
 
         <a href="../prestamos.php   " class="btn btn-danger" style="margin-bottom: 10px;">Regresar</a>
+        <a href="exportar_pdf2.php" class="btn btn-primary" style="margin-bottom: 10px;">Generar Reporte</a>
     </div>
 
     <!-- footer -->

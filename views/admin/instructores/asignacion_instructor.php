@@ -4,6 +4,10 @@ $db = new Database();
 $conectar = $db->conectar();
 session_start();
 
+if (!isset($_SESSION['documento'])) {
+    header("Location: ../../../login.php"); // Redirigir a la página de inicio si no está logueado
+    exit();
+}
 $tip_forQuery = $conectar->prepare("SELECT id_formacion,formacion FROM formacion");
 $tip_forQuery->execute();
 $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
@@ -22,12 +26,11 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
     if ($documento == "" || $ficha == "") {
         echo '<script>alert("EXISTEN CAMPOS VACÍOS");</script>';
         echo '<script>window location="asignacion_instructor.php"</script>';
-    }
-    else {
+    } else {
 
-        $insertdeta = $conectar->prepare("INSERT INTO detalle_instructor(documento,ficha) VALUES (?, ?)");
+        $insertdeta = $conectar->prepare("INSERT INTO detalle_usuarios(documento,ficha) VALUES (?, ?)");
         $insertdeta->execute([$documento, $ficha]);
-        
+
         echo '<script>alert ("Registro Exitoso");</script>';
         echo '<script> window.location= "lista_instructores.php"</script>';
     }
@@ -93,7 +96,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
             <div class="container mt-5">
                 <form method="post" action="" autocomplete="off">
 
-                <div class="form-group">
+                    <div class="form-group">
                         <label for="documento">Nombre instructor:</label>
                         <select class="form-control" id="documento" name="documento" required>
                             <option value="" disabled selected>Selecciona el instructor</option> <!-- Placeholder -->
@@ -181,55 +184,31 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                 <div class="container">
                     <div class="row">
                         <div class=" col-md-3 col-sm-6">
-                            <ul class="social_icon">
-                                <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
-                                <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                            </ul>
-                            <p class="variat pad_roght2">There are many variat
-                                ions of passages of L
-                                orem Ipsum available
-                                , but the majority h
-                                ave suffered altera
-                                tion in some form, by
+                            <h3>variedad</h3>
+                            <p class="variat pad_roght2">Ofrecemos una amplia variedad de herramientas
+                                de alta calidad para satisfacer todas tus necesidades de
+                                construcción.Tenemos todo lo que necesitas para completar
+                                tus proyectos con éxito.
                             </p>
                         </div>
                         <div class=" col-md-3 col-sm-6">
-                            <h3>LET US HELP YOU </h3>
-                            <p class="variat pad_roght2">There are many variat
-                                ions of passages of L
-                                orem Ipsum available
-                                , but the majority h
-                                ave suffered altera
-                                tion in some form, by
+                            <h3>dejanos ayudarte </h3>
+                            <p class="variat pad_roght2">Nuestro objetivo es facilitarte el acceso a las herramientas
+                                que necesitas para tus proyectos. Con nuestro proceso de préstamo simple y transparente,
+                                puedes obtener las herramientas adecuadas sin complicaciones ni demoras.
                             </p>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <h3>INFORMATION</h3>
-                            <ul class="link_menu">
-                                <li><a href="index.html">Home</a></li>
-                                <li><a href="about.html"> About</a></li>
-                                <li><a href="service.html">Services</a></li>
-                                <li><a href="gallery.html">Gallery</a></li>
-                                <li><a href="testimonial.html">Testimonial</a></li>
-                                <li><a href="contact.html">Contact Us</a></li>
-                            </ul>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <h3>OUR Design</h3>
-                            <p class="variat">There are many variat
-                                ions of passages of L
-                                orem Ipsum available
-                                , but the majority h
-                                ave suffered altera
-                                tion in some form, by
+                            <h3>NUESTRO DISEÑO</h3>
+                            <p class="variat">En nuestra empresa, nos esforzamos por ofrecer un diseño intuitivo
+                                y fácil de usar en todas nuestras plataformas. Nuestra interfaz está diseñada
+                                pensando en la comodidad y la accesibilidad del usuario.
                             </p>
                         </div>
                         <div class="col-md-6 offset-md-6">
                             <form id="hkh" class="bottom_form">
-                                <input class="enter" placeholder="Enter your email" type="text" name="Enter your email">
-                                <button class="sub_btn">subscribe</button>
+                                <input class="enter" placeholder="" type="text" name="Enter your email">
+                                <button class="sub_btn">Prestamos de herramientas</button>
                             </form>
                         </div>
                     </div>
@@ -238,7 +217,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                     <div class="container">
                         <div class="row">
                             <div class="col-md-10 offset-md-1">
-                                <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Free Html Templates</a></p>
+                                <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Cristian Figueroa</a></p>
                             </div>
                         </div>
                     </div>

@@ -5,6 +5,11 @@ $conectar = $db->conectar();
 session_start();
 
 
+if (!isset($_SESSION['documento'])) {
+    header("Location: ../../../login.php"); // Redirigir a la página de inicio si no está logueado
+    exit();
+}
+
 if (isset($_GET['id'])) {
     // Recupera el ID de la URL
     $id = $_GET['id'];
@@ -17,7 +22,6 @@ if (isset($_GET['id'])) {
     $tiposherrasQuery->execute();
     $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
 
-    // Check if form is submitted
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $nombre = $_POST['nombre'];
         $tipo = $_POST['tipo'];
@@ -25,13 +29,10 @@ if (isset($_GET['id'])) {
         // Prepare and execute the update query
         $updateQuery = $conectar->prepare("UPDATE herrramienta SET nombre_he = ?, id_cate = ? WHERE id_herramienta = ?");
         $updateQuery->execute([$nombre, $tipo, $id]);
-        // Redirect to the page displaying the updated data or any other desired location
-        header("Location: lista.php");
-        exit();
-    }
 
-    // Retrieve existing data for the selected record
-    else {
+        echo '<script>alert ("Actualizacion Exitosa");</script>';
+        echo '<script> window.location= "lista.php"</script>';
+    } else {
     }
 }
 ?>
@@ -94,7 +95,7 @@ if (isset($_GET['id'])) {
 
     <section class="section">
         <div class="container my-5">
-            <div class="row" >
+            <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
                     <h2>Actualizar Herramienta</h2>
                     <form method="POST">
@@ -114,10 +115,10 @@ if (isset($_GET['id'])) {
                         </select>
                 </div>
 
-
-                <button type="submit" class="btn btn-success" style="margin-top:1rem; margin-left:1.6em;">Actualizar</button>
+                <button type="submit" class="btn btn-success" style="margin-top:1rem; margin-left:1.6rem;">Actualizar</button>
                 </form>
             </div>
+            <a href="lista.php" class="btn btn-danger">Volver</a>
         </div>
         </div>
     </section>
@@ -126,41 +127,32 @@ if (isset($_GET['id'])) {
             <div class="container">
                 <div class="row">
                     <div class=" col-md-3 col-sm-6">
-                        <ul class="social_icon">
-                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                        </ul>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>variedad</h3>
+                        <p class="variat pad_roght2">Ofrecemos una amplia variedad de herramientas
+                            de alta calidad para satisfacer todas tus necesidades de
+                            construcción.Tenemos todo lo que necesitas para completar
+                            tus proyectos con éxito.
                         </p>
                     </div>
                     <div class=" col-md-3 col-sm-6">
-                        <h3>LET US HELP YOU </h3>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>dejanos ayudarte </h3>
+                        <p class="variat pad_roght2">Nuestro objetivo es facilitarte el acceso a las herramientas
+                            que necesitas para tus proyectos. Con nuestro proceso de préstamo simple y transparente,
+                            puedes obtener las herramientas adecuadas sin complicaciones ni demoras.
                         </p>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <h3>INFORMATION</h3>
-                        <ul class="link_menu">
-                        </ul>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <h3>OUR Design</h3>
-                        <p class="variat">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>NUESTRO DISEÑO</h3>
+                        <p class="variat">En nuestra empresa, nos esforzamos por ofrecer un diseño intuitivo
+                            y fácil de usar en todas nuestras plataformas. Nuestra interfaz está diseñada
+                            pensando en la comodidad y la accesibilidad del usuario.
                         </p>
+                    </div>
+                    <div class="col-md-6 offset-md-6">
+                        <form id="hkh" class="bottom_form">
+                            <input class="enter" placeholder="" type="text" name="Enter your email">
+                            <button class="sub_btn">Prestamos de herramientas</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -168,7 +160,7 @@ if (isset($_GET['id'])) {
                 <div class="container">
                     <div class="row">
                         <div class="col-md-10 offset-md-1">
-                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Free Html Templates</a></p>
+                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Cristian Figueroa</a></p>
                         </div>
                     </div>
                 </div>

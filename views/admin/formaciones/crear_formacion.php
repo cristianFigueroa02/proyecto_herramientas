@@ -3,6 +3,10 @@ require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
+if (!isset($_SESSION['documento'])) {
+    header("Location: ./../../login.php"); // Redirigir a la página de inicio si no está logueado
+    exit();
+}
 
 if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
     $ficha = $_POST["ficha"];
@@ -12,9 +16,6 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
     if ($nombre == "" || $ficha == "" || $jornada == "") {
         echo '<script> alert ("EXISTEN DATOS VACIOS");</script>';
         echo '<script> window.location="crear_formacion.php"</script>';
-    } else if ($fila1) {
-        echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
-        echo '<script> window.location= "lista_formaciones.php"</script>';
     } else {
         $insertsql = $conectar->prepare("INSERT INTO formacion(id_formacion,formacion,jornada) VALUES (?, ?, ?)");
         $insertsql->execute([$ficha, $nombre, $jornada]);
@@ -105,7 +106,7 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
                 </div>
 
 
-                <input type="submit" class="btn btn-success" value="Registrate">
+                <input type="submit" class="btn btn-success" value="Registrar">
                 <input type="hidden" name="registro" value="formu">
                 <a href="lista_formaciones.php" class="btn btn-danger">Volver</a>
             </form>
@@ -117,41 +118,32 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
             <div class="container">
                 <div class="row">
                     <div class=" col-md-3 col-sm-6">
-                        <ul class="social_icon">
-                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                        </ul>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>variedad</h3>
+                        <p class="variat pad_roght2">Ofrecemos una amplia variedad de herramientas
+                            de alta calidad para satisfacer todas tus necesidades de
+                            construcción.Tenemos todo lo que necesitas para completar
+                            tus proyectos con éxito.
                         </p>
                     </div>
                     <div class=" col-md-3 col-sm-6">
-                        <h3>LET US HELP YOU </h3>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>dejanos ayudarte </h3>
+                        <p class="variat pad_roght2">Nuestro objetivo es facilitarte el acceso a las herramientas
+                            que necesitas para tus proyectos. Con nuestro proceso de préstamo simple y transparente,
+                            puedes obtener las herramientas adecuadas sin complicaciones ni demoras.
                         </p>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <h3>INFORMATION</h3>
-                        <ul class="link_menu">
-                        </ul>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <h3>OUR Design</h3>
-                        <p class="variat">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>NUESTRO DISEÑO</h3>
+                        <p class="variat">En nuestra empresa, nos esforzamos por ofrecer un diseño intuitivo
+                            y fácil de usar en todas nuestras plataformas. Nuestra interfaz está diseñada
+                            pensando en la comodidad y la accesibilidad del usuario.
                         </p>
+                    </div>
+                    <div class="col-md-6 offset-md-6">
+                        <form id="hkh" class="bottom_form">
+                            <input class="enter" placeholder="" type="text" name="Enter your email">
+                            <button class="sub_btn">Prestamos de herramientas</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -159,7 +151,7 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
                 <div class="container">
                     <div class="row">
                         <div class="col-md-10 offset-md-1">
-                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Free Html Templates</a></p>
+                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Cristian Figueroa</a></p>
                         </div>
                     </div>
                 </div>

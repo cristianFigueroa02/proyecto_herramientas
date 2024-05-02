@@ -1,78 +1,9 @@
-
-
 <?php
 require_once("bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
-
-//superadmin: 
-//documento: 1107975322
-//contraseña: $2y$15$nmOJkdLlTBmKk7gxu3zg1OpdsI5ufU8GuNdDJiEv15c4sMzQdKxXO
-
-//admin: 
-//documento: 171717
-//constraseña: $2y$15$6r4pE4IwUlrwuydtZgvXaOfyBrShteuyG8FIN5cj9jhFeKC/IqL8y
 // Verificamos que la contraseña sea correcta utilizando password_verify
-
-if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
-    // Obtener datos del formulario
-    $documento = $_POST["documento"];
-    $contrasena = $_POST["contrasena"];
-
-
-
-
-    $usuarioQuery = $conectar->prepare("SELECT * FROM usuario, licencia WHERE licencia.nit = usuario.nit AND licencia.estado = 'activo' AND documento = ?");
-    $usuarioQuery->execute([$documento]);
-    $usuario = $usuarioQuery->fetch();
-
-
-
-    if ($usuario) {
- 
-
-        if (password_verify($contrasena, $usuario['contraseña'])) {
-
-
-            if ($usuario['estado'] == "activo") {
-                $_SESSION['documento'] = $usuario['documento'];
-                $_SESSION['rol'] = $usuario['id_rol'];
-                $_SESSION['estado'] = $usuario['estado'];
-
-                var_dump($_SESSION); 
-
-
-
-
-
-                if ($_SESSION['rol'] == 1) {
-                    header("Location: views/admin/index.php");
-                    exit();
-                } elseif ($_SESSION['rol'] == 2) {
-                    header("Location: views/usuario/index.php");
-                    exit();
-                } elseif ($_SESSION['rol'] == 3) {
-                    header("Location: views/superadmin/index.php");
-                    exit();
-                }
-                elseif ($_SESSION['rol'] == 4) {
-                    header("Location: views/instructor/index.php");
-                    exit();
-                } else {
-                    echo "<script> alert ('Su usuario está bloqueado');</script>";
-                    echo '<script>window.location="index.html"</script>';
-                    exit();
-                }
-            } else {
-                echo "<script> alert ('La contraseña es incorrecta o no esta activa tu licencia');</script>";
-                echo '<script>window.location="index.html"</script>';
-                exit();
-            }
-        } 
-    }
-}
-
 ?>
 
 
@@ -109,6 +40,73 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 </head>
+<style>
+    .formulario {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 400px;
+    }
+
+    .formulario__grupo {
+        margin-bottom: 20px;
+    }
+
+    .formulario__label {
+        display: block;
+        
+        margin-bottom: 5px;
+    }
+
+    .formulario__input {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+    .formulario__input:focus {
+        outline: none;
+        border-color: #66afe9;
+    }
+
+    .formulario__input-error {
+        display: none;
+        color: #d9534f;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .formulario__grupo-incorrecto .formulario__input {
+        border-color: #d9534f;
+    }
+
+    .formulario__grupo-incorrecto .formulario__input-error {
+        display: block;
+    }
+
+    .formulario__grupo-correcto .formulario__input {
+        border-color: #5cb85c;
+    }
+
+    .formulario__btn {
+        background-color: #5cb85c;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+    .formulario__btn:hover {
+        background-color: #4cae4c;
+    }
+</style>
 
 <body class="main-layout in_page">
     <!-- header -->
@@ -137,7 +135,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                                         <a class="nav-link" href="index.html">Principal</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="contact.html">Contactanos</a>
+                                        <a class="nav-link" href="contact.php">Contactanos</a>
                                     </li>
                                     <li class="nav-item active">
                                         <a class="nav-link" href="login.php">login</a>
@@ -161,18 +159,19 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                         <div class="card-body">
                             <h4 class="card-title text-center">Iniciar Sesión</h4>
                             <!-- Formulario -->
-                            <form name="formreg" method="POST">
-                                <div class="form-group">
-                                    <label for="documento">Documento</label>
-                                    <input type="text" class="form-control" id="documento" name="documento" placeholder="Ingresa tu documento">
+                            <form id="formulario" method="post" action="" autocomplete="off">
+                                <div class="formulario__grupo" id="grupo__documento">
+                                    <label for="documento" class="formulario__label">Documento:</label>
+                                    <input type="text" class="formulario__input" id="documento" name="documento" required>
+                                    <p class="formulario__input-error">El documento debe ser válido.</p>
                                 </div>
                                 <div class="form-group">
                                     <label for="contrasena">Contraseña</label>
                                     <input type="password" class="form-control" id="contrasena" name="contrasena" placeholder="Ingresa tu contraseña">
                                 </div>
-                                <input type="hidden" name="MM_insert" value="formreg">
                                 <button type="submit" class="btn btn-success btn-block">Iniciar sesion</button>
                             </form>
+                            <a href="recuperar_contraseña.php" style="margin-top: 10px;">Olvidaste tu contraseña? </a>
                         </div>
                     </div>
                 </div>
@@ -184,55 +183,31 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
             <div class="container">
                 <div class="row">
                     <div class=" col-md-3 col-sm-6">
-                        <ul class="social_icon">
-                            <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                            <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                            <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
-                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                        </ul>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>variedad</h3>
+                        <p class="variat pad_roght2">Ofrecemos una amplia variedad de herramientas
+                            de alta calidad para satisfacer todas tus necesidades de
+                            construcción.Tenemos todo lo que necesitas para completar
+                            tus proyectos con éxito.
                         </p>
                     </div>
                     <div class=" col-md-3 col-sm-6">
-                        <h3>LET US HELP YOU </h3>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>dejanos ayudarte </h3>
+                        <p class="variat pad_roght2">Nuestro objetivo es facilitarte el acceso a las herramientas
+                            que necesitas para tus proyectos. Con nuestro proceso de préstamo simple y transparente,
+                            puedes obtener las herramientas adecuadas sin complicaciones ni demoras.
                         </p>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <h3>INFORMATION</h3>
-                        <ul class="link_menu">
-                            <li><a href="index.html">Home</a></li>
-                            <li><a href="about.html"> About</a></li>
-                            <li><a href="service.html">Services</a></li>
-                            <li><a href="gallery.html">Gallery</a></li>
-                            <li><a href="testimonial.html">Testimonial</a></li>
-                            <li><a href="contact.html">Contact Us</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <h3>OUR Design</h3>
-                        <p class="variat">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>NUESTRO DISEÑO</h3>
+                        <p class="variat">En nuestra empresa, nos esforzamos por ofrecer un diseño intuitivo
+                            y fácil de usar en todas nuestras plataformas. Nuestra interfaz está diseñada
+                            pensando en la comodidad y la accesibilidad del usuario.
                         </p>
                     </div>
                     <div class="col-md-6 offset-md-6">
                         <form id="hkh" class="bottom_form">
-                            <input class="enter" placeholder="Enter your email" type="text" name="Enter your email">
-                            <button class="sub_btn">subscribe</button>
+                            <input class="enter" placeholder="" type="text" name="Enter your email">
+                            <button class="sub_btn">Prestamos de herramientas</button>
                         </form>
                     </div>
                 </div>
@@ -241,7 +216,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
                 <div class="container">
                     <div class="row">
                         <div class="col-md-10 offset-md-1">
-                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Free Html Templates</a></p>
+                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Cristian Figueroa</a></p>
                         </div>
                     </div>
                 </div>
@@ -251,6 +226,7 @@ if (isset($_POST["MM_insert"]) && $_POST["MM_insert"] == "formreg") {
     <!-- end footer -->
     <!-- Javascript files-->
     <script src="js/jquery.min.js"></script>
+    <script src="validacion_login.js"></script>
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/jquery-3.0.0.min.js"></script>
     <!-- sidebar -->

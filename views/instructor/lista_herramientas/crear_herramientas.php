@@ -3,12 +3,18 @@ require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 session_start();
+
+if (!isset($_SESSION['documento'])) {
+    header("Location: ../../../login.php"); // Redirigir a la página de inicio si no está logueado
+    exit();
+}
 require '../../../vendor/autoload.php';
 
 use Picqer\Barcode\BarcodeGeneratorPNG;
 
 if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
     $nombre = $_POST['nombre'];
+    $cantidad = $_POST['cantidad'];
     $tipo = $_POST['tipo'];
     $imagen = $_FILES['imagen'];
 
@@ -28,8 +34,8 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
 
     move_uploaded_file($imagen["tmp_name"], "../../../images/$foto");
 
-    $validar = $conectar->prepare("SELECT codigo_barras FROM herrramienta WHERE codigo_barras = ?");
-    $validar->execute([$codigo_barras]);
+    $validar = $conectar->prepare("SELECT codigo_barras,nombre_he FROM herrramienta WHERE codigo_barras = ? OR nombre_he = ?");
+    $validar->execute([$codigo_barras, $nombre]);
     $fila1 = $validar->fetch();
 
     if ($nombre == "" || $tipo == "" || $codigo_barras == "") {
@@ -39,8 +45,8 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
         echo '<script> alert ("LA HERRAMIENTA YA EXISTE");</script>';
         echo '<script> window.location= "lista.php"</script>';
     } else {
-        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras) VALUES (?, ?, ?, 'sin prestamo', ?)");
-        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras]);
+        $insertsql = $conectar->prepare("INSERT INTO herrramienta(nombre_he, id_cate,img_herramienta, estado, codigo_barras,cantidad,stock) VALUES (?, ?, ?, 'disponible', ?,?,?)");
+        $insertsql->execute([$nombre, $tipo, $foto, $codigo_barras, $cantidad,$cantidad]);
         echo '<script>alert ("Registro Exitoso");</script>';
         echo '<script> window.location= "lista.php"</script>';
     }
@@ -116,28 +122,30 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
                     <label for="nombre">Nombre de la herramienta:</label>
                     <input type="text" class="form-control" id="nombre" name="nombre" required>
                 </div>
+
                 <div class="form-group">
+                    <label for="nombre">Cantidad:</label>
+                    <input type="number" class="form-control" id="nombre" name="cantidad" required>
+                </div>
 
+                <div class="form-group">
+                    <label for="tipo">Tipo de herramienta:</label>
+                    <select class="form-control" id="tipo" name="tipo" required>
+                        <option value="" disabled selected>Selecciona un tipo de herramienta</option> <!-- Placeholder -->
+                        <?php foreach ($tiposherra as $tipoherra) : ?>
+                            <option value="<?php echo $tipoherra['id_cate']; ?>"><?php echo $tipoherra['categoria']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
+                <div class="form-group">
+                    <label for="imagen">Imagen:</label>
+                    <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*" required>
+                </div>
 
-                    <div class="form-group">
-                        <label for="tipo">Tipo de herramienta:</label>
-                        <select class="form-control" id="tipo" name="tipo" required>
-                            <option value="" disabled selected>Selecciona un tipo de arma</option> <!-- Placeholder -->
-                            <?php foreach ($tiposherra as $tipoherra) : ?>
-                                <option value="<?php echo $tipoherra['id_cate']; ?>"><?php echo $tipoherra['categoria']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="imagen">Imagen:</label>
-                        <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*" required>
-                    </div>
-
-                    <input type="submit" class="btn btn-success" value="Registrate">
-                    <input type="hidden" name="registro" value="formu">
-                    <a href="lista.php" class="btn btn-danger">Volver</a>
+                <input type="submit" class="btn btn-success" value="Registrar">
+                <input type="hidden" name="registro" value="formu">
+                <a href="lista.php" class="btn btn-danger">Volver</a>
             </form>
         </div>
     </main>
@@ -147,41 +155,32 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
             <div class="container">
                 <div class="row">
                     <div class=" col-md-3 col-sm-6">
-                        <ul class="social_icon">
-                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                        </ul>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>variedad</h3>
+                        <p class="variat pad_roght2">Ofrecemos una amplia variedad de herramientas
+                            de alta calidad para satisfacer todas tus necesidades de
+                            construcción.Tenemos todo lo que necesitas para completar
+                            tus proyectos con éxito.
                         </p>
                     </div>
                     <div class=" col-md-3 col-sm-6">
-                        <h3>LET US HELP YOU </h3>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>dejanos ayudarte </h3>
+                        <p class="variat pad_roght2">Nuestro objetivo es facilitarte el acceso a las herramientas
+                            que necesitas para tus proyectos. Con nuestro proceso de préstamo simple y transparente,
+                            puedes obtener las herramientas adecuadas sin complicaciones ni demoras.
                         </p>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <h3>INFORMATION</h3>
-                        <ul class="link_menu">
-                        </ul>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <h3>OUR Design</h3>
-                        <p class="variat">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>NUESTRO DISEÑO</h3>
+                        <p class="variat">En nuestra empresa, nos esforzamos por ofrecer un diseño intuitivo
+                            y fácil de usar en todas nuestras plataformas. Nuestra interfaz está diseñada
+                            pensando en la comodidad y la accesibilidad del usuario.
                         </p>
+                    </div>
+                    <div class="col-md-6 offset-md-6">
+                        <form id="hkh" class="bottom_form">
+                            <input class="enter" placeholder="" type="text" name="Enter your email">
+                            <button class="sub_btn">Prestamos de herramientas</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -189,7 +188,7 @@ $tiposherra = $tiposherrasQuery->fetchAll(PDO::FETCH_ASSOC);
                 <div class="container">
                     <div class="row">
                         <div class="col-md-10 offset-md-1">
-                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Free Html Templates</a></p>
+                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Cristian Figueroa</a></p>
                         </div>
                     </div>
                 </div>

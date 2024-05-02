@@ -4,27 +4,42 @@ $db = new Database();
 $conectar = $db->conectar();
 session_start();
 
+
+if (!isset($_SESSION['documento'])) {
+    header("Location: ../../../login.php"); // Redirigir a la página de inicio si no está logueado
+    exit();
+}
 if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
 
     $rol = $_POST['rol'];
 
-    // Verificar si ya existe un registro con el mismo NIT
-    $validar_rol = $conectar->prepare("SELECT rol FROM rol WHERE rol = ?");
-    $validar_rol->execute([$rol]);
-    $existe_rol = $validar_rol->fetch();
+    // Lista de roles prohibidos
+    $roles_prohibidos = array("administrador", "superadmin");
 
-    if ($existe_rol) {
-        echo '<script> alert ("Ya existe ese rol.");</script>';
+    // Verificar si el rol ingresado está en la lista de roles prohibidos
+    if (in_array(strtolower($rol), $roles_prohibidos)) {
+        echo '<script> alert ("No se pueden crear los roles de administrador ni superadmin.");</script>';
         echo '<script> window.location="lista_roles.php"</script>';
     } else {
-        // Insertar los datos en la base de datos
-        $insertsql = $conectar->prepare("INSERT INTO rol (rol) VALUES (?)");
-        $insertsql->execute([$rol]);
-        echo '<script>alert ("Registro exitoso.");</script>';
-        echo '<script> window.location= "lista_roles.php"</script>';
+        // Verificar si ya existe un registro con el mismo rol
+        $validar_rol = $conectar->prepare("SELECT rol FROM rol WHERE rol = ?");
+        $validar_rol->execute([$rol]);
+        $existe_rol = $validar_rol->fetch();
+
+        if ($existe_rol) {
+            echo '<script> alert ("Ya existe ese rol.");</script>';
+            echo '<script> window.location="lista_roles.php"</script>';
+        } else {
+            // Insertar los datos en la base de datos
+            $insertsql = $conectar->prepare("INSERT INTO rol (rol) VALUES (?)");
+            $insertsql->execute([$rol]);
+            echo '<script>alert ("Registro exitoso.");</script>';
+            echo '<script> window.location= "lista_roles.php"</script>';
+        }
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -83,15 +98,15 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
     </header>
     <main class="contenedor sombra">
         <div class="container mt-5">
-            <h2>Registro de Empresa</h2>
-            <form  method="POST">
+            <h2>Registro de Rol</h2>
+            <form method="POST">
                 <div class="form-group">
                     <label for="rol">Nombre del rol:</label>
                     <input type="text" id="rol" name="rol" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-success">Registrar</button>
                 <input type="hidden" name="registro" value="formu">
-                <a href="lista_empresas.php" class="btn btn-danger">Cancelar</a>
+                <a href="lista_roles.php" class="btn btn-danger">Cancelar</a>
             </form>
         </div>
     </main>
@@ -101,41 +116,32 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
             <div class="container">
                 <div class="row">
                     <div class=" col-md-3 col-sm-6">
-                        <ul class="social_icon">
-                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                        </ul>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>variedad</h3>
+                        <p class="variat pad_roght2">Ofrecemos una amplia variedad de herramientas
+                            de alta calidad para satisfacer todas tus necesidades de
+                            construcción.Tenemos todo lo que necesitas para completar
+                            tus proyectos con éxito.
                         </p>
                     </div>
                     <div class=" col-md-3 col-sm-6">
-                        <h3>LET US HELP YOU </h3>
-                        <p class="variat pad_roght2">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>dejanos ayudarte </h3>
+                        <p class="variat pad_roght2">Nuestro objetivo es facilitarte el acceso a las herramientas
+                            que necesitas para tus proyectos. Con nuestro proceso de préstamo simple y transparente,
+                            puedes obtener las herramientas adecuadas sin complicaciones ni demoras.
                         </p>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <h3>INFORMATION</h3>
-                        <ul class="link_menu">
-                        </ul>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <h3>OUR Design</h3>
-                        <p class="variat">There are many variat
-                            ions of passages of L
-                            orem Ipsum available
-                            , but the majority h
-                            ave suffered altera
-                            tion in some form, by
+                        <h3>NUESTRO DISEÑO</h3>
+                        <p class="variat">En nuestra empresa, nos esforzamos por ofrecer un diseño intuitivo
+                            y fácil de usar en todas nuestras plataformas. Nuestra interfaz está diseñada
+                            pensando en la comodidad y la accesibilidad del usuario.
                         </p>
+                    </div>
+                    <div class="col-md-6 offset-md-6">
+                        <form id="hkh" class="bottom_form">
+                            <input class="enter" placeholder="" type="text" name="Enter your email">
+                            <button class="sub_btn">Prestamos de herramientas</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -143,7 +149,7 @@ if ((isset($_POST["registro"])) && ($_POST["registro"] == "formu")) {
                 <div class="container">
                     <div class="row">
                         <div class="col-md-10 offset-md-1">
-                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Free Html Templates</a></p>
+                            <p>© 2019 All Rights Reserved. Design by <a href="https://html.design/"> Cristian Figueroa</a></p>
                         </div>
                     </div>
                 </div>

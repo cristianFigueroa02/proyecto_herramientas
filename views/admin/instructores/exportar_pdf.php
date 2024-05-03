@@ -41,18 +41,18 @@ if (isset($_SESSION['documento'])) {
     $pdf->SetFont('Arial', '', 12);
 
     // Agregar encabezados de columna
-    $pdf->Cell(30, 10, 'Documento', 1);
+    $pdf->Cell(40, 10, 'Documento', 1);
     $pdf->Cell(40, 10, 'Nombre', 1);
-    $pdf->Cell(40, 10, 'Direccion', 1);
+    $pdf->Cell(70, 10, 'Direccion', 1);
     $pdf->Cell(40, 10, 'Empresa', 1);
     $pdf->Cell(30, 10, 'Estado', 1);
     $pdf->Ln();
 
     // Agregar datos de la tabla a la hoja de cálculo
     foreach ($asigna as $usua) {
-        $pdf->Cell(30, 10, $usua["documento"], 1);
+        $pdf->Cell(40, 10, $usua["documento"], 1);
         $pdf->Cell(40, 10, $usua["nombre"], 1);
-        $pdf->Cell(40, 10, $usua["email"], 1);
+        $pdf->Cell(70, 10, $usua["email"], 1);
         $pdf->Cell(40, 10, $usua["nombre_empre"], 1);
         $pdf->Cell(30, 10, $usua["estado"], 1);
         $pdf->Ln();

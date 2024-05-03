@@ -1,5 +1,5 @@
 <?php
-require_once("bd/database.php");
+require_once("../../../bd/database.php");
 $db = new Database();
 $conectar = $db->conectar();
 
@@ -55,7 +55,7 @@ try {
                 $insertdet = $conectar->prepare("INSERT INTO `detalle_usuarios` (`documento`, `ficha`) VALUES (:documento, :ficha)");
                 $insertdet->bindParam(':documento', $documento);
                 $insertdet->bindParam(':ficha', $ficha);
-                
+
                 if (!$insertdet->execute()) {
                     // Si la inserción falla en `detalle_usuarios`
                     $response = array("status" => "error", "message" => "Error al insertar en detalle_usuarios");
@@ -71,4 +71,3 @@ try {
 }
 
 echo json_encode($response);
-?>

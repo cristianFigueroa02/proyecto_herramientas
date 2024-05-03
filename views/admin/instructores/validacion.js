@@ -82,7 +82,7 @@ formulario.addEventListener("submit", (e) => {
           console.log(data.message);
           alert("¡Registro exitoso!");
           formulario.reset();
-          window.location.href = "login.php"; // Redireccionar a login.php
+          window.location.href = "lista_instructores.php"; // Redireccionar 
         }
       })
       .catch((error) => {

@@ -188,7 +188,23 @@ $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
                                             <label for="fichaInput" class="formulario__label">Ficha:</label>
                                             <input type="number" class="formulario__input" id="fichaInput" name="ficha" required>
                                             <p class="formulario__input-error">La ficha debe ser válida y solo debe contener numeros.</p>
+                                            <button onclick="abrirVentana()">crear formacion</button>
+
+                                            <script>
+                                                function abrirVentana() {
+                                                    // URL que quieres abrir en la ventana emergente
+                                                    var url = "../formaciones/crear_formacion.php";
+
+                                                    // Ancho y alto de la ventana emergente (ajustar según necesites)
+                                                    var ancho = 600;
+                                                    var alto = 400;
+
+                                                    // Abrir la ventana emergente
+                                                    window.open(url, "_blank", "width=" + ancho + ", height=" + alto);
+                                                }
+                                            </script>
                                         </div>
+
 
                                         <div class="form-group">
                                             <label for="formacion" class="formulario__label">Formación:</label>
@@ -210,7 +226,7 @@ $tiposfor = $tip_forQuery->fetchAll(PDO::FETCH_ASSOC);
                                         <div class="formulario__grupo">
                                             <label>
                                                 <input type="checkbox" name="tyc" id="tyc" value="si" required>
-                                                Acepto los términos y condiciones
+                                                <a href="terminos.html">Acepto los términos y condiciones</a>
                                             </label>
                                         </div>
                                         <button type="submit" class="btn btn-success" style="margin-bottom: 10px;">Registrarme</button>

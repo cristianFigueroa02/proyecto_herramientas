@@ -36,18 +36,18 @@ $pdf->SetTitle('Reporte de Instructores Asociados');
 $pdf->SetFont('Arial', '', 12);
 
 // Agregar encabezados de columna
-$pdf->Cell(30, 10, 'Documento', 1);
+$pdf->Cell(40, 10, 'Documento', 1);
 $pdf->Cell(50, 10, 'Nombre', 1);
-$pdf->Cell(40, 10, 'Direccion email', 1);
+$pdf->Cell(70, 10, 'Direccion email', 1);
 $pdf->Cell(40, 10, 'ficha', 1);
 $pdf->Cell(40, 10, 'Estado', 1);
 $pdf->Ln();
 
 // Agregar datos de los instructores asociados a la hoja de cálculo
 foreach ($asigna as $usua) {
-    $pdf->Cell(30, 10, $usua["documento"], 1);
+    $pdf->Cell(40, 10, $usua["documento"], 1);
     $pdf->Cell(50, 10, $usua["nombre"], 1);
-    $pdf->Cell(40, 10, $usua["email"], 1);
+    $pdf->Cell(70, 10, $usua["email"], 1);
     $pdf->Cell(40, 10, $usua["ficha"], 1);
     $pdf->Cell(40, 10, $usua["estado"], 1);
     $pdf->Ln();

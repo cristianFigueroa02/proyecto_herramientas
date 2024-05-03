@@ -35,7 +35,7 @@ if (isset($_SESSION['documento'])) {
     $pdf->SetFont('Arial', '', 12);
 
     // Agregar encabezados de columna
-    $pdf->Cell(30, 10, 'Documento', 1);
+    $pdf->Cell(40, 10, 'Documento', 1);
     $pdf->Cell(50, 10, 'Nombre', 1);
     $pdf->Cell(40, 10, 'Fecha Inicio', 1);
     $pdf->Cell(40, 10, 'Fecha Fin', 1);
